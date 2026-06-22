@@ -1,2 +1,0 @@
-# bali
-Bali travel

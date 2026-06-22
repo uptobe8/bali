@@ -1,25 +1,29 @@
-# Nusa Travel OS v5
+# Nusa Travel OS v7
 
-App visual paginada para viaje a Indonesia/Bali.
+App local de viajes para Indonesia/Bali con navegación por pantallas, guía visual tipo revista, mapa guía isométrico 3D, mapa GPS real, itinerario día a día, reservas, comidas, transportes, zona Iria & Izan y resumen final.
 
 ## Abrir
 
-- Abrir `index.html` directamente.
-- Mac: doble clic en `start.command` y abrir `http://localhost:8095`.
-- Windows: doble clic en `start.bat` y abrir `http://localhost:8095`.
+Modo rápido: abre `index.html`.
+
+Modo recomendado Mac: abre `start.command` y entra en `http://localhost:8097`.
+
+Modo recomendado Windows: abre `start.bat` y entra en `http://localhost:8097`.
 
 ## Incluye
 
-- Guía visual estilo revista, no scroll largo.
-- Mapa guía tipo isla/3D con puntos clicables.
-- Mapa GPS real con Leaflet/OpenStreetMap cuando hay internet.
-- Botones Waze y Google Maps en cada zona.
-- Itinerario día a día con horarios, hotel, comida, transportes, costes orientativos y enlaces.
-- Pantalla de reservas: vuelos, hoteles, actividades y transportes.
-- Zona Iria & Izan para subir enlaces, fotos y documentos; las ideas seleccionadas se aplican al viaje.
-- Sonido de selva activable.
+- Portada visual.
+- Guía tipo revista/guidebook.
+- Mapa guía isométrico 3D con pines clicables.
+- Mapa GPS real con Leaflet/OpenStreetMap.
+- Waze + Google Maps por zona.
+- Itinerario de 16 días con hotel, comidas, transportes, costes orientativos, horarios y enlaces.
+- Reservas: hoteles, vuelos, actividades y comidas.
+- Zona Iria & Izan para subir enlaces, fotos, documentos y notas.
+- Botón para aplicar ideas al viaje.
 - Resumen final descargable.
+- Sonido de selva generado en navegador.
 
-## Nota sobre Waze y offline
+## Nota
 
-La app abre rutas en Waze. Para viajar con poco internet, hay que preparar las rutas con conexión antes de salir y llevar además un mapa descargado de Bali/Indonesia en una app offline. Waze no sustituye a una descarga completa de país como app offline dedicada.
+Los precios y horarios de vuelos, hoteles, ferries y actividades son orientativos y sirven para decidir. Antes de reservar se deben confirmar en proveedor real.

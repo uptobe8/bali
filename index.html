@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nusa Travel OS · Indonesia visual planner</title>
+  <meta name="description" content="Aplicación visual para diseñar un viaje completo a Indonesia: Bali, Gili Meno, Padang Padang, vuelos, alojamientos, actividades, transportes, mapa y decisión final." />
+  <meta name="theme-color" content="#042015" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQ2AT7M2aVtly4UdsX1tZVfMI5HRGZo=" crossorigin="" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <button class="brand" data-page="inicio" aria-label="Ir al inicio">
+        <span class="brand-mark">N</span>
+        <span>
+          <strong>Nusa Travel OS</strong>
+          <em>Indonesia · Bali · Gili Meno</em>
+        </span>
+      </button>
+      <nav class="nav-pills" aria-label="Pantallas principales">
+        <button class="nav-pill active" data-page="inicio">Inicio</button>
+        <button class="nav-pill" data-page="preferencias">Preferencias</button>
+        <button class="nav-pill" data-page="propuestas">Propuestas</button>
+        <button class="nav-pill" data-page="itinerario">Itinerario</button>
+        <button class="nav-pill" data-page="mapa">Mapa</button>
+        <button class="nav-pill" data-page="reservas">Reservas</button>
+        <button class="nav-pill" data-page="decision">Decisión</button>
+      </nav>
+      <div class="sound-area">
+        <span id="soundLabel" class="sound-label">Ambiente selva indonesia</span>
+        <button id="soundToggle" class="sound-btn">Activar sonido de selva</button>
+      </div>
+    </header>
+
+    <main class="stage" id="stage">
+      <section class="page active" id="page-inicio" data-title="Inicio"></section>
+      <section class="page" id="page-preferencias" data-title="Preferencias"></section>
+      <section class="page" id="page-propuestas" data-title="Propuestas"></section>
+      <section class="page" id="page-itinerario" data-title="Itinerario"></section>
+      <section class="page" id="page-mapa" data-title="Mapa"></section>
+      <section class="page" id="page-vuelos" data-title="Vuelos"></section>
+      <section class="page" id="page-alojamientos" data-title="Alojamientos"></section>
+      <section class="page" id="page-actividades" data-title="Actividades"></section>
+      <section class="page" id="page-transportes" data-title="Transportes"></section>
+      <section class="page" id="page-checklist" data-title="Checklist"></section>
+      <section class="page" id="page-decision" data-title="Decisión"></section>
+    </main>
+
+    <footer class="pager" aria-label="Paginación de la app">
+      <button id="prevPage" class="pager-btn secondary">Anterior</button>
+      <div class="page-dots" id="pageDots"></div>
+      <button id="nextPage" class="pager-btn">Siguiente</button>
+    </footer>
+  </div>
+
+  <template id="cardTemplate">
+    <article class="card"></article>
+  </template>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

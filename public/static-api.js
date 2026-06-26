@@ -6,14 +6,31 @@
   const dataUrl = `${base}/db-export.json`;
   const K = { itinerary: 'nusa-static-itinerary', suggestions: 'nusa-static-suggestions', job: 'nusa-static-generate-job' };
   let cache = null;
+  const IMG = /\.(png|jpe?g|webp|gif|svg|mp4|webm)(\?.*)?$/i;
   const json = (body, init = {}) => new Response(JSON.stringify(body), { status: init.status || 200, headers: { 'content-type': 'application/json' } });
   const uid = (p) => `${p}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
   const read = (k, fallback) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fallback; } catch { return fallback; } };
   const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+  const fixUrl = (v) => {
+    if (typeof v !== 'string' || !v || v.startsWith('http') || v.startsWith('data:') || v.startsWith('blob:')) return v;
+    if (v.startsWith('/_next/')) return base + v;
+    if (v.startsWith('/') && IMG.test(v)) return base + v;
+    if (!v.startsWith('/') && IMG.test(v) && !v.includes('://')) return `${base}/${v}`;
+    return v;
+  };
+  const normalize = (v) => {
+    if (Array.isArray(v)) return v.map(normalize);
+    if (v && typeof v === 'object') {
+      const out = {};
+      for (const [k, val] of Object.entries(v)) out[k] = normalize(val);
+      return out;
+    }
+    return fixUrl(v);
+  };
   const load = async () => {
     if (cache) return cache;
     const r = await originalFetch(dataUrl, { cache: 'no-store' });
-    cache = await r.json();
+    cache = normalize(await r.json());
     return cache;
   };
   const text = (v) => String(v == null ? '' : v).toLowerCase();
@@ -32,15 +49,7 @@
   });
   const generated = (prefs) => {
     const trip = {
-      id: uid('trip'),
-      title: prefs.destination || 'Indonesia · Bali',
-      destination: prefs.destination || 'Indonesia · Bali',
-      dates: prefs.dates || '14-16 días',
-      travellers: prefs.travellers || 'Pareja / familia',
-      budget: prefs.budget || 'Medio',
-      pace: prefs.pace || 'Equilibrado',
-      musts: prefs.musts || 'Bali, Ubud, Uluwatu, Gili Meno, Padang Padang',
-      restrictions: prefs.restrictions || null,
+      id: uid('trip'), title: prefs.destination || 'Indonesia · Bali', destination: prefs.destination || 'Indonesia · Bali', dates: prefs.dates || '14-16 días', travellers: prefs.travellers || 'Pareja / familia', budget: prefs.budget || 'Medio', pace: prefs.pace || 'Equilibrado', musts: prefs.musts || 'Bali, Ubud, Uluwatu, Gili Meno, Padang Padang', restrictions: prefs.restrictions || null,
     };
     const zones = ['Ubud', 'Sidemen', 'Uluwatu', 'Padang Padang', 'Sanur', 'Gili Meno', 'Nusa Penida', 'Seminyak'];
     const imgs = [
@@ -50,18 +59,7 @@
       'https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?auto=format&fit=crop&w=1600&q=88'
     ];
     const days = zones.map((zone, i) => ({
-      id: uid(`day-${i + 1}`), tripId: trip.id, order: i, day: `Día ${i + 1}`, zone,
-      title: `${zone}: plan visual y completo`, image: imgs[i % imgs.length],
-      morning: `Ruta principal por ${zone} con paradas fotográficas y margen realista de traslado.`,
-      lunch: `Comida local en zona ${zone}, priorizando warungs bien valorados y ubicaciones prácticas.`,
-      afternoon: `Actividad destacada adaptada al ritmo ${prefs.pace || 'equilibrado'}: playa, templo, arrozales o snorkel según zona.`,
-      night: 'Cena y paseo tranquilo para cerrar el día sin saturar el viaje.',
-      transport: 'Coche privado, taxi local o ferry según tramo. Confirmar horario antes de reservar.',
-      cost: prefs.budget === 'Alto' ? '90 – 180 €/persona' : prefs.budget === 'Bajo' ? '25 – 55 €/persona' : '45 – 95 €/persona',
-      time: '09:00 – 21:00', mapQuery: `${zone} Bali Indonesia`, wazeQuery: `${zone} Bali Indonesia`,
-      advice: 'Plan generado en modo estático para GitHub Pages. Revisa horarios reales antes de reservar.',
-      hotelName: null, hotelPrice: null, hotelLink: null, mealLunchName: null, mealLunchPrice: null, mealLunchLink: null,
-      mealDinnerName: null, mealDinnerPrice: null, mealDinnerLink: null, coordsLat: null, coordsLng: null,
+      id: uid(`day-${i + 1}`), tripId: trip.id, order: i, day: `Día ${i + 1}`, zone, title: `${zone}: plan visual y completo`, image: imgs[i % imgs.length], morning: `Ruta principal por ${zone} con paradas fotográficas y margen realista de traslado.`, lunch: `Comida local en zona ${zone}, priorizando warungs bien valorados y ubicaciones prácticas.`, afternoon: `Actividad destacada adaptada al ritmo ${prefs.pace || 'equilibrado'}: playa, templo, arrozales o snorkel según zona.`, night: 'Cena y paseo tranquilo para cerrar el día sin saturar el viaje.', transport: 'Coche privado, taxi local o ferry según tramo. Confirmar horario antes de reservar.', cost: prefs.budget === 'Alto' ? '90 – 180 €/persona' : prefs.budget === 'Bajo' ? '25 – 55 €/persona' : '45 – 95 €/persona', time: '09:00 – 21:00', mapQuery: `${zone} Bali Indonesia`, wazeQuery: `${zone} Bali Indonesia`, advice: 'Plan generado en modo estático para GitHub Pages. Revisa horarios reales antes de reservar.', hotelName: null, hotelPrice: null, hotelLink: null, mealLunchName: null, mealLunchPrice: null, mealLunchLink: null, mealDinnerName: null, mealDinnerPrice: null, mealDinnerLink: null, coordsLat: null, coordsLng: null,
     }));
     return { trip, days };
   };

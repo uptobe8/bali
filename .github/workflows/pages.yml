@@ -24,12 +24,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate gh-pages folder
-        shell: bash
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Prepare static data
         run: |
-          set -e
-          test -f gh-pages/index.html
-          echo "Publishing gh-pages/"
+          mkdir -p public
+          if [ -f db-export.json ]; then cp db-export.json public/db-export.json; fi
+          if [ -f gh-pages/_data.json ] && [ ! -f public/db-export.json ]; then cp gh-pages/_data.json public/db-export.json; fi
+
+      - name: Build static app
+        env:
+          NEXT_PUBLIC_STATIC_EXPORT: "true"
+          NEXT_PUBLIC_BASE_PATH: "/bali"
+        run: bun run build
+
+      - name: Validate static output
+        run: test -f out/index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -37,7 +53,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: gh-pages
+          path: out
 
       - name: Deploy to GitHub Pages
         id: deployment

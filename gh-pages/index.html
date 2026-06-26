@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nusa Travel OS — Indonesia · Bali</title>
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=Manrope:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script>
+tailwind.config={
+  theme:{
+    extend:{
+      colors:{
+        'nusa-ink':'#041813','nusa-forest':'#06281d','nusa-jungle':'#00c875','nusa-jungle-2':'#08f084',
+        'nusa-teal':'#00d5ff','nusa-sea':'#0067ff','nusa-sun':'#ffd400','nusa-coral':'#ff4b2f',
+        'nusa-pink':'#ff2d55','nusa-mist':'#f7fff7',
+        'paper':'#fdfcf8','paper-2':'#f4f1e9','ink':'#0b2a23','ink-soft':'#1a3a30',
+        'ember':'#e87722','ember-soft':'#f3a653','leaf':'#0b3d2e','leaf-2':'#16604a','moss':'#2f7a52','sand':'#c9b896'
+      },
+      fontFamily:{'display':['Playfair Display','Georgia','serif'],'body':['Manrope','system-ui','sans-serif']}
+    }
+  }
+}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Manrope',system-ui,sans-serif;overflow-x:hidden}
+.font-display{font-family:'Playfair Display',Georgia,serif}
+.kicker{letter-spacing:.16em;text-transform:uppercase;font-weight:800;font-size:11px}
+.kicker-sun{color:#ffd400}.kicker-ember{color:#e87722}.kicker-leaf{color:#0b3d2e}
+
+/* Shell bg */
+.nusa-shell-bg{background:radial-gradient(circle at 12% 12%,rgba(0,213,255,.22),transparent 30%),radial-gradient(circle at 90% 6%,rgba(255,212,0,.18),transparent 26%),radial-gradient(circle at 80% 92%,rgba(255,75,47,.20),transparent 32%),linear-gradient(135deg,#03100b 0%,#052817 42%,#001c28 100%)}
+.nusa-paper{background:#fdfcf8;color:#0b2a23}
+
+/* Nav pills */
+.nusa-nav-pill{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:#fff;padding:7px 11px;border-radius:999px;font-weight:800;font-size:11.5px;white-space:nowrap;transition:.18s;cursor:pointer}
+.nusa-nav-pill:hover{background:rgba(255,255,255,.14)}
+.nusa-nav-pill.active{background:linear-gradient(135deg,#00c875,#00d5ff);color:#03110d;border-color:transparent;box-shadow:0 10px 26px rgba(0,213,255,.22)}
+
+/* Buttons */
+.nusa-btn-primary{border:0;background:linear-gradient(135deg,#ff4b2f,#ffd400 45%,#00c875);color:#06120c;padding:12px 18px;border-radius:999px;font-weight:900;box-shadow:0 16px 34px rgba(0,0,0,.28);transition:.18s;cursor:pointer;font-size:14px}
+.nusa-btn-primary:hover{transform:translateY(-2px) scale(1.01)}
+.nusa-btn-secondary{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.10);color:#fff;padding:12px 18px;border-radius:999px;font-weight:900;transition:.18s;cursor:pointer;font-size:14px}
+.nusa-btn-secondary:hover{background:rgba(255,255,255,.18)}
+.nusa-btn-ember{border:0;background:linear-gradient(135deg,#e87722,#f3a653);color:#fff;padding:12px 18px;border-radius:999px;font-weight:900;box-shadow:0 14px 30px rgba(232,119,34,.32);transition:.18s;cursor:pointer;font-size:14px}
+.nusa-btn-ghost{border:1px solid rgba(11,42,35,.18);background:transparent;color:#0b2a23;padding:11px 18px;border-radius:999px;font-weight:800;transition:.18s;cursor:pointer;font-size:14px}
+.nusa-btn-ghost:hover{background:rgba(11,61,46,.08)}
+.nusa-btn-green{border:0;background:linear-gradient(135deg,#00c875,#00d5ff);color:#03110d;padding:10px 16px;border-radius:999px;font-weight:900;cursor:pointer;font-size:13px;transition:.18s}
+.nusa-btn-green:hover{opacity:.9}
+
+/* Panel */
+.nusa-panel{background:linear-gradient(145deg,rgba(4,32,21,.9),rgba(2,17,31,.84));border:1px solid rgba(255,255,255,.16);box-shadow:0 26px 70px rgba(0,0,0,.36);border-radius:26px}
+.nusa-card-paper{background:#fff;border:1px solid rgba(11,61,46,.12);border-radius:18px;box-shadow:0 12px 32px rgba(11,61,46,.08)}
+.nusa-divider{height:2px;background:linear-gradient(90deg,#e87722,#f3a653 60%,transparent);border:0;border-radius:2px}
+.nusa-leaf-box{background:#0b3d2e;color:#fff;border-radius:16px;padding:18px 20px}
+
+/* Dots */
+.nusa-dot{width:9px;height:9px;border-radius:999px;border:0;background:rgba(255,255,255,.28);padding:0;transition:.18s;cursor:pointer}
+.nusa-dot.active{width:30px;background:linear-gradient(90deg,#ffd400,#00c875)}
+
+/* Scrollbars */
+.nusa-scroll::-webkit-scrollbar{width:10px;height:10px}
+.nusa-scroll::-webkit-scrollbar-thumb{background:linear-gradient(#00c875,#00d5ff);border-radius:20px}
+.nusa-scroll::-webkit-scrollbar-track{background:rgba(255,255,255,.06);border-radius:20px}
+.nusa-scroll-paper::-webkit-scrollbar{width:10px;height:10px}
+.nusa-scroll-paper::-webkit-scrollbar-thumb{background:#0b3d2e;border-radius:20px}
+.nusa-scroll-paper::-webkit-scrollbar-track{background:rgba(11,61,46,.08);border-radius:20px}
+
+/* Animations */
+@keyframes nusa-rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.nusa-rise{animation:nusa-rise .35s ease both}
+@keyframes nusa-pulse{0%{transform:scale(.6);opacity:.9}100%{transform:scale(1.6);opacity:0}}
+
+/* Sheet overlay */
+.sheet-overlay{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.4);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .25s}
+.sheet-overlay.open{opacity:1;pointer-events:auto}
+.sheet-panel{position:fixed;top:0;right:0;bottom:0;z-index:101;width:100%;max-width:480px;background:#fdfcf8;transform:translateX(100%);transition:transform .3s ease;overflow-y:auto}
+.sheet-panel.open{transform:translateX(0)}
+
+/* Tabs */
+.nusa-tab{padding:8px 16px;border-radius:999px;font-weight:800;font-size:13px;cursor:pointer;transition:.18s;border:none;background:transparent;color:#0b2a23}
+.nusa-tab.active{background:#0b3d2e;color:#fff}
+.nusa-tab:hover:not(.active){background:rgba(11,61,46,.08)}
+
+/* Select */
+.nusa-select{appearance:none;background:#f4f1e9 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%230b2a23' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E") no-repeat right 10px center;padding:8px 32px 8px 12px;border-radius:12px;border:1px solid rgba(11,61,46,.15);font-size:13px;color:#0b2a23;font-weight:600}
+.nusa-select:focus{outline:2px solid #00c875;outline-offset:-1px}
+
+/* Search input */
+.nusa-search{background:#f4f1e9;border:1px solid transparent;padding:8px 12px 8px 36px;border-radius:12px;font-size:13px;color:#0b2a23;width:100%}
+.nusa-search:focus{outline:2px solid #00c875;outline-offset:-1px;border-color:transparent}
+
+/* Badge */
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;font-weight:700;font-size:11px;white-space:nowrap}
+
+/* Gallery */
+.gallery-card{min-width:220px;max-width:260px;flex-shrink:0;cursor:pointer;overflow:hidden;border-radius:16px;transition:transform .3s}
+.gallery-card:hover{transform:scale(1.03)}
+.gallery-card img{transition:transform .5s}
+.gallery-card:hover img{transform:scale(1.08)}
+
+/* Lightbox */
+.lightbox{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.92);display:none;grid:place-items:center;cursor:zoom-out}
+.lightbox.open{display:grid}
+.lightbox img{max-width:92vw;max-height:88vh;object-fit:contain;border-radius:12px}
+
+/* Print */
+@media print{.nusa-no-print{display:none!important}body{background:#fff!important;color:#111!important}}
+
+/* Leaflet dark */
+.leaflet-container{background:#0a1d14;font-family:'Manrope',sans-serif}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#061a14;color:#f7fff7;border:1px solid rgba(0,200,117,.45);border-radius:14px}
+.leaflet-popup-content{margin:12px 14px;font-size:13px;line-height:1.5}
+.leaflet-popup-content strong{color:#ffd400}
+.leaflet-control-zoom a{background:#061a14!important;color:#f7fff7!important;border-color:rgba(0,200,117,.35)!important}
+.leaflet-control-attribution{background:rgba(4,24,19,.7)!important;color:#b8d8cd!important}
+.leaflet-control-attribution a{color:#00d5ff!important}
+</style>
+</head>
+<body class="bg-[#03100b] text-nusa-mist">
+<!-- HEADER -->
+<header class="sticky top-0 z-50 bg-[#041813]/85 backdrop-blur-md border-b border-white/10 nusa-no-print">
+  <div class="mx-auto max-w-7xl px-3 sm:px-6 py-3 flex items-center gap-3">
+    <button onclick="goPage('inicio')" class="flex items-center gap-2 shrink-0" aria-label="Inicio">
+      <span class="grid place-items-center w-9 h-9 rounded-xl bg-gradient-to-br from-nusa-jungle to-nusa-teal text-nusa-ink shadow-lg" style="font-size:18px">🌿</span>
+      <span class="hidden sm:block leading-tight">
+        <span class="block font-display text-base text-white">Nusa Travel OS</span>
+        <span class="kicker kicker-sun">Indonesia · Bali</span>
+      </span>
+    </button>
+    <nav id="nav-bar" class="ml-auto flex items-center gap-1.5 overflow-x-auto nusa-scroll py-1" aria-label="Navegación"></nav>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main id="main" class="flex-1"></main>
+
+<!-- FOOTER -->
+<footer class="mt-auto bg-[#041813]/95 backdrop-blur-md border-t border-white/10 nusa-no-print">
+  <div class="mx-auto max-w-7xl px-3 sm:px-6 py-3 flex items-center justify-between gap-3">
+    <button onclick="go(-1)" class="nusa-btn-secondary inline-flex items-center gap-1.5 text-sm !py-2.5 !px-3 sm:!px-4" aria-label="Anterior">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      <span class="hidden sm:inline">Anterior</span>
+    </button>
+    <div id="footer-dots" class="flex items-center gap-2"></div>
+    <button onclick="go(1)" class="nusa-btn-secondary inline-flex items-center gap-1.5 text-sm !py-2.5 !px-3 sm:!px-4" aria-label="Siguiente">
+      <span class="hidden sm:inline">Siguiente</span>
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+</footer>
+
+<!-- SHEET OVERLAY -->
+<div id="sheet-overlay" class="sheet-overlay" onclick="closeSheet()"></div>
+<div id="sheet-panel" class="sheet-panel nusa-scroll-paper"></div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" class="lightbox" onclick="this.classList.remove('open')"><img id="lightbox-img" src="" alt=""></div>
+
+<!-- AUDIO -->
+<audio id="ambient-audio" src="sounds/jungle-ambient.mp3" loop preload="none"></audio>
+
+<script src="data.js"></script>
+<script>
+// ────────────── NAVIGATION ──────────────
+const PAGES=[
+  {id:'inicio',label:'Inicio',dark:true},{id:'itinerario',label:'Itinerario',dark:false},
+  {id:'guia',label:'Guía',dark:false},{id:'gastronomia',label:'Gastronomía',dark:false},
+  {id:'playas',label:'Playas',dark:false},{id:'actividades',label:'Actividades',dark:false},
+  {id:'elefantes',label:'Elefantes',dark:false},{id:'fauna',label:'Fauna',dark:false},
+  {id:'mapa',label:'Mapa',dark:true},{id:'sugerencias',label:'Izan & Iria',dark:false},
+  {id:'resumen',label:'Resumen',dark:false}
+];
+let currentPage='inicio',pageIdx=0;
+
+function buildNav(){
+  const nav=document.getElementById('nav-bar');
+  nav.innerHTML=PAGES.map(p=>`<button class="nusa-nav-pill ${p.id===currentPage?'active':''}" onclick="goPage('${p.id}')" aria-current="${p.id===currentPage?'page':''}">${p.label}</button>`).join('');
+  const dots=document.getElementById('footer-dots');
+  dots.innerHTML=PAGES.map(p=>`<button class="nusa-dot ${p.id===currentPage?'active':''}" onclick="goPage('${p.id}')" aria-label="${p.label}"></button>`).join('');
+  dots.innerHTML+=`<span class="ml-3 text-[11px] text-white/55 font-bold hidden sm:block">${PAGES[pageIdx].label} · ${pageIdx+1}/${PAGES.length}</span>`;
+}
+
+function goPage(id){
+  currentPage=id;pageIdx=PAGES.findIndex(p=>p.id===id);
+  const pg=PAGES[pageIdx];
+  document.body.className=pg.dark?'bg-[#03100b] text-nusa-mist':'bg-paper text-ink';
+  buildNav();renderPage();window.scrollTo({top:0,behavior:'smooth'});
+}
+function go(dir){
+  pageIdx=(pageIdx+dir+PAGES.length)%PAGES.length;
+  goPage(PAGES[pageIdx].id);
+}
+
+// Keyboard nav
+document.addEventListener('keydown',e=>{
+  const t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable))return;
+  if(e.key==='ArrowLeft'){e.preventDefault();go(-1)}else if(e.key==='ArrowRight'){e.preventDefault();go(1)}
+  if(e.key==='Escape')closeSheet();
+});
+
+// ────────────── SHEET (detail panels) ──────────────
+function openSheet(html){
+  document.getElementById('sheet-panel').innerHTML=html;
+  document.getElementById('sheet-overlay').classList.add('open');
+  document.getElementById('sheet-panel').classList.add('open');
+}
+function closeSheet(){
+  document.getElementById('sheet-overlay').classList.remove('open');
+  document.getElementById('sheet-panel').classList.remove('open');
+}
+
+// ────────────── HELPERS ──────────────
+function esc(s){if(!s)return'';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function wazeNav(q){return`https://waze.com/ul?ll=${q.replace(/,/g,'%2C')}&navigate=yes`}
+function wazeCoord(lat,lng){return`https://waze.com/ul?ll=${lat},${lng}&navigate=yes`}
+function gmap(q){return`https://www.google.com/maps/search/${encodeURIComponent(q)}`}
+function stars(r){return'<span class="text-nusa-sun font-bold">★</span> <span class="font-bold">'+(r||0).toFixed(1)+'</span>'}
+function priceLabel(l){return['','€ Económico','€€ Medio','€€€ Alto'][l]||'€€'}
+
+// ────────────── RENDER PAGES ──────────────
+function renderPage(){
+  const m=document.getElementById('main');
+  const renderers={inicio:renderInicio,itinerario:renderItinerario,guia:renderGuia,gastronomia:renderGastronomia,playas:renderPlayas,actividades:renderActividades,elefantes:renderElefantes,fauna:renderFauna,mapa:renderMapa,sugerencias:renderSugerencias,resumen:renderResumen};
+  (renderers[currentPage]||renderInicio)(m);
+}
+
+// ────────────── INICIO ──────────────
+const GALLERY=[
+  {src:'playas/padang-padang-beach-01.jpg',label:'Padang Padang, Bali'},
+  {src:'playas/kelingking-beach-01.jpg',label:'Kelingking, Nusa Penida'},
+  {src:'actividades/1-bali-espiritualidad-y-naturaleza/1-bali-ubud-sur-norte/e-bike-mountain-bike-por-arrozales-de-ubud/e-bike-mountain-bike-por-arrozales-de-ubud-01.jpg',label:'Arrozales de Tegallalang'},
+  {src:'playas/atuh-beach-01.jpg',label:'Atuh Beach, Nusa Penida'},
+  {src:'actividades/3-komodo-y-flores-tierra-de-dragones/3-2-flores-interior/trekking-a-wae-rebo/trekking-a-wae-rebo-01.jpg',label:'Wae Rebo, Flores'},
+  {src:'playas/long-beach-pink-beach-padar-01.jpg',label:'Pink Beach, Komodo'},
+  {src:'playas/wayag-beach-01.jpg',label:'Wayag, Raja Ampat'},
+  {src:'playas/dreamland-beach-01.jpg',label:'Dreamland, Bali'},
+  {src:'playas/angels-billabong-01.jpg',label:'Angels Billabong, Bali'},
+  {src:'fauna/trekking-para-ver-dragones-en-komodo-island-01.jpg',label:'Dragones de Komodo'},
+  {src:'playas/gili-trawangan-sunset-beach-01.jpg',label:'Gili Trawangan'},
+  {src:'playas/melasti-beach-01.jpg',label:'Melasti Beach, Bali'},
+];
+
+function renderInicio(m){
+  const D=NUSA_DATA,days=D.days||[],trip=D.trip,guideCount=(D.guide||[]).length;
+  const zoneCount=trip?[...new Set(days.map(d=>d.zone.split('·')[0].trim()))].size:0;
+  let soundOn=false;
+  m.innerHTML=`
+  <div class="nusa-shell-bg text-nusa-mist">
+    <section class="mx-auto max-w-7xl px-5 sm:px-8 pt-6 sm:pt-10 pb-20">
+      <!-- HERO -->
+      <div class="nusa-panel p-2 sm:p-3 nusa-rise">
+        <div class="relative rounded-2xl overflow-hidden bg-black">
+          <img src="hero-bali.jpg" alt="Vista aérea de Bali" class="w-full h-[280px] sm:h-[400px] lg:h-[480px] object-cover" loading="eager">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+          <div class="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent"></div>
+          <div class="absolute inset-0 z-[1] flex flex-col justify-end p-5 sm:p-8 lg:p-10">
+            <span class="kicker kicker-sun text-xs sm:text-sm">Nusa Travel OS · Planificador de viajes</span>
+            <h1 class="font-display text-3xl sm:text-4xl lg:text-5xl text-white mt-2 leading-[1.08] max-w-2xl">Crea tu viaje a medida, día a día.</h1>
+            <p class="mt-3 text-sm sm:text-base text-white/80 leading-relaxed max-w-xl">Elige cómo es el viaje que queréis. Nuestra IA genera un itinerario completo con hoteles, restaurantes, transportes, playas y precios, todo enlazado a Waze.</p>
+            <div class="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 max-w-2xl">
+              <div class="nusa-panel px-3 py-2 text-center"><div class="text-xl sm:text-2xl font-black text-white">${days.length}</div><div class="text-[10px] text-white/50 font-bold uppercase tracking-wider">días de viaje</div></div>
+              <div class="nusa-panel px-3 py-2 text-center"><div class="text-xl sm:text-2xl font-black text-white">${zoneCount}</div><div class="text-[10px] text-white/50 font-bold uppercase tracking-wider">zonas clave</div></div>
+              <div class="nusa-panel px-3 py-2 text-center"><div class="text-xl sm:text-2xl font-black text-white">${guideCount}</div><div class="text-[10px] text-white/50 font-bold uppercase tracking-wider">entradas de guía</div></div>
+              <div class="nusa-panel px-3 py-2 text-center"><div class="text-xl sm:text-2xl font-black text-nusa-sun">IA</div><div class="text-[10px] text-white/50 font-bold uppercase tracking-wider">generación con IA</div></div>
+            </div>
+          </div>
+          <button id="sound-btn" onclick="toggleSound()" class="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm text-white/80 hover:text-white hover:bg-black/60 transition grid place-items-center" aria-label="Sonido ambiente">
+            <svg id="sound-icon-off" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+            <svg id="sound-icon-on" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- GALLERY -->
+      <div class="mt-8 nusa-rise">
+        <div class="flex items-center justify-between mb-4 px-1">
+          <div><span class="kicker kicker-sun text-sm">Indonesia en imágenes</span><h2 class="font-display text-xl sm:text-2xl text-white mt-0.5">Descubre lo que te espera</h2></div>
+          <div class="flex gap-1.5">
+            <button onclick="document.getElementById('gallery-scroll').scrollBy({left:-300,behavior:'smooth'})" class="nusa-panel w-9 h-9 grid place-items-center text-white/70 hover:text-white transition p-0 border-0 cursor-pointer">‹</button>
+            <button onclick="document.getElementById('gallery-scroll').scrollBy({left:300,behavior:'smooth'})" class="nusa-panel w-9 h-9 grid place-items-center text-white/70 hover:text-white transition p-0 border-0 cursor-pointer">›</button>
+          </div>
+        </div>
+        <div id="gallery-scroll" class="flex gap-4 overflow-x-auto nusa-scroll pb-2">
+          ${GALLERY.map(p=>`<div class="gallery-card" onclick="openLightbox('${p.src}')"><div class="h-36 overflow-hidden rounded-t-2xl"><img src="${p.src}" alt="${esc(p.label)}" class="w-full h-full object-cover" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full bg-gradient-to-br from-nusa-jungle/20 to-nusa-teal/10 grid place-items-center text-3xl\\'>🏝️</div>'"></div><div class="p-2.5 bg-white/5 backdrop-blur-sm"><p class="text-xs font-bold text-white/90 truncate">${esc(p.label)}</p></div></div>`).join('')}
+        </div>
+      </div>
+
+      ${trip?`
+      <!-- TRIP SUMMARY -->
+      <div class="mt-8 nusa-rise">
+        <div class="flex items-center justify-between mb-4 px-1">
+          <div><span class="kicker kicker-ember text-sm">${esc(trip.title)}</span><h2 class="font-display text-xl sm:text-2xl text-white mt-0.5">Tu viaje generado</h2></div>
+          <button onclick="goPage('itinerario')" class="nusa-btn-green inline-flex items-center gap-1.5 text-sm">Ver itinerario →</button>
+        </div>
+        <div class="grid sm:grid-cols-3 gap-3">
+          <div class="nusa-panel p-4"><div class="text-white/50 text-xs font-bold uppercase mb-1">Destino</div><div class="text-white font-bold">${esc(trip.destination)}</div></div>
+          <div class="nusa-panel p-4"><div class="text-white/50 text-xs font-bold uppercase mb-1">Viajeros</div><div class="text-white font-bold">${esc(trip.travellers)}</div></div>
+          <div class="nusa-panel p-4"><div class="text-white/50 text-xs font-bold uppercase mb-1">Presupuesto</div><div class="text-white font-bold">${esc(trip.budget)}</div></div>
+        </div>
+      </div>`:`
+      <!-- NO TRIP STATE -->
+      <div class="mt-8 nusa-panel p-8 sm:p-12 text-center nusa-rise max-w-2xl mx-auto">
+        <div class="text-4xl mb-4">🧭</div>
+        <h3 class="font-display text-xl text-white mb-2">App en modo lectura</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Esta versión estática muestra el itinerario, la guía y todos los catálogos. Para generar nuevos viajes con IA o enviar sugerencias, usa la versión completa en Next.js.</p>
+      </div>`}
+    </section>
+  </div>`;
+}
+
+function toggleSound(){
+  const a=document.getElementById('ambient-audio');
+  if(a.paused){a.volume=.35;a.play().catch(()=>{})}
+  else{a.pause();a.currentTime=0}
+  document.getElementById('sound-icon-off').style.display=a.paused?'block':'none';
+  document.getElementById('sound-icon-on').style.display=a.paused?'none':'block';
+  document.getElementById('sound-btn').className=a.paused
+    ?'absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm text-white/80 hover:text-white hover:bg-black/60 transition grid place-items-center'
+    :'absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-nusa-jungle/60 text-white hover:bg-nusa-jungle/80 transition grid place-items-center';
+}
+function openLightbox(src){const lb=document.getElementById('lightbox');document.getElementById('lightbox-img').src=src;lb.classList.add('open')}
+
+
+// ────────────── ITINERARIO ──────────────
+function renderItinerario(m){
+  const D=NUSA_DATA,days=D.days||[],trip=D.trip;
+  if(!trip){m.innerHTML='<div class="nusa-paper min-h-screen"><div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10"><span class="kicker kicker-ember">Itinerario día a día</span><h1 class="font-display text-3xl sm:text-5xl text-ink mt-2 leading-tight">Tu viaje, contado día por día</h1><hr class="nusa-divider mt-5"><div class="nusa-card-paper p-10 text-center mt-8 text-ink-soft">No hay viaje generado. Esta versión es de solo lectura.</div></div></div>';return}
+  m.innerHTML=`<div class="nusa-paper min-h-screen"><div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+    <header class="mb-8"><span class="kicker kicker-ember">Itinerario día a día</span><h1 class="font-display text-3xl sm:text-5xl text-ink mt-2 leading-tight">${esc(trip.title)}</h1>
+    <p class="mt-3 text-ink-soft max-w-2xl leading-relaxed">${esc(trip.dates)}. Cada día con su alojamiento, sus comidas, su transporte y sus enlaces vivos a Waze y a Google Maps.</p>
+    <hr class="nusa-divider mt-5"></header>
+    <div class="grid lg:grid-cols-[300px_1fr] gap-6">
+      <aside><div class="lg:sticky lg:top-24"><div class="kicker kicker-leaf mb-3">Los ${days.length} días</div>
+        <div class="flex lg:flex-col gap-2 overflow-x-auto nusa-scroll-paper pb-2 lg:pb-0 lg:max-h-[70vh] lg:overflow-y-auto">
+          ${days.map((d,i)=>`<button onclick="showDay(${i})" id="day-btn-${i}" class="shrink-0 lg:shrink text-left rounded-xl border p-3 transition min-w-[220px] lg:min-w-0 border-leaf/12 bg-white/60 hover:bg-white ${i===0?'!border-ember bg-white shadow-[0_10px_28px_rgba(232,119,34,0.18)]':''}">
+            <div class="flex items-center gap-2">
+              <div class="w-10 h-10 rounded-lg bg-cover bg-center shrink-0" style="background-image:url(${esc(d.image)})"></div>
+              <div class="min-w-0"><div class="text-[11px] font-black text-ember uppercase tracking-wider">${esc(d.day)} · ${esc(d.zone.split('·')[0].trim())}</div><div class="font-display text-sm text-ink leading-tight truncate">${esc(d.title)}</div></div>
+            </div></button>`).join('')}
+        </div></div></aside>
+      <div id="day-detail">${dayHTML(days[0],0,days)}</div>
+    </div></div></div>`;
+}
+function showDay(i){
+  const D=NUSA_DATA,days=D.days;
+  document.querySelectorAll('[id^=day-btn-]').forEach((b,j)=>{b.className=b.className.replace(/!border-ember bg-white shadow-\[0_10px_28px_rgba\(232,119,34,0\.18\)\]/,'border-leaf/12 bg-white/60 hover:bg-white');if(j===i)b.className=b.className.replace('border-leaf/12 bg-white/60 hover:bg-white','!border-ember bg-white shadow-[0_10px_28px_rgba(232,119,34,0.18)]')});
+  document.getElementById('day-detail').innerHTML=dayHTML(days[i],i,days);
+}
+function dayHTML(d,i,days){
+  const prev=days[i-1],next=days[i+1];
+  return`<div class="nusa-rise">
+    <div class="relative rounded-2xl overflow-hidden bg-black h-[260px] sm:h-[360px]"><img src="${esc(d.image)}" alt="${esc(d.title)}" class="w-full h-full object-cover" onerror="this.style.display='none'"><div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+      <div class="absolute bottom-0 left-0 right-0 p-5 sm:p-8"><span class="kicker kicker-sun text-sm">${esc(d.day)} · ${esc(d.zone)}</span><h2 class="font-display text-2xl sm:text-4xl text-white mt-1 leading-tight">${esc(d.title)}</h2></div>
+    </div>
+    <div class="mt-4 grid sm:grid-cols-4 gap-3">
+      <div class="nusa-card-paper p-4"><div class="text-ink-soft text-xs font-bold uppercase mb-1">🌅 Mañana</div><p class="text-sm text-ink leading-relaxed">${esc(d.morning)}</p></div>
+      <div class="nusa-card-paper p-4"><div class="text-ink-soft text-xs font-bold uppercase mb-1">🍽️ Comida</div><p class="text-sm text-ink leading-relaxed">${esc(d.lunch)}</p></div>
+      <div class="nusa-card-paper p-4"><div class="text-ink-soft text-xs font-bold uppercase mb-1">☀️ Tarde</div><p class="text-sm text-ink leading-relaxed">${esc(d.afternoon)}</p></div>
+      <div class="nusa-card-paper p-4"><div class="text-ink-soft text-xs font-bold uppercase mb-1">🌙 Noche</div><p class="text-sm text-ink leading-relaxed">${esc(d.night)}</p></div>
+    </div>
+    <div class="mt-4 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      ${d.hotelName?`<a href="${esc(d.hotelLink)||'#'}" target="_blank" rel="noopener" class="nusa-card-paper p-4 block hover:shadow-lg transition"><div class="text-ink-soft text-xs font-bold uppercase mb-1">🏨 Hotel</div><div class="font-bold text-ink">${esc(d.hotelName)}</div><div class="text-sm text-ember mt-1">${esc(d.hotelPrice)}</div></a>`:''}
+      ${d.mealLunchName?`<div class="nusa-card-paper p-4"><div class="text-ink-soft text-xs font-bold uppercase mb-1">🍴 Comida</div><div class="font-bold text-ink">${esc(d.mealLunchName)}</div><div class="text-sm text-ember mt-1">${esc(d.mealLunchPrice)}</div></div>`:''}
+      ${d.mealDinnerName?`<div class="nusa-card-paper p-4"><div class="text-ink-soft text-xs font-bold uppercase mb-1">🍽️ Cena</div><div class="font-bold text-ink">${esc(d.mealDinnerName)}</div><div class="text-sm text-ember mt-1">${esc(d.mealDinnerPrice)}</div></div>`:''}
+      <div class="nusa-card-paper p-4"><div class="text-ink-soft text-xs font-bold uppercase mb-1">🚗 Transporte</div><p class="text-sm text-ink">${esc(d.transport)}</p><div class="text-sm text-ember mt-1">${esc(d.cost)}</div></div>
+    </div>
+    <div class="mt-4 nusa-leaf-box"><p class="text-xs text-nusa-sun font-bold uppercase tracking-wider mb-1">💡 Consejo del día</p><p class="text-white/90 text-sm leading-relaxed">${esc(d.advice)}</p></div>
+    <div class="mt-4 flex flex-wrap gap-2">
+      <a href="${wazeNav(d.wazeQuery||d.mapQuery)}" target="_blank" rel="noopener" class="nusa-btn-green inline-flex items-center gap-1.5 text-sm">🧭 Abrir en Waze</a>
+      ${d.coordsLat?`<a href="${wazeCoord(d.coordsLat,d.coordsLng)}" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 border border-white/25 text-ink text-xs font-bold px-3 py-2 rounded-full hover:bg-leaf/10 transition">📍 Ver ruta en Waze</a>`:''}
+      <a href="${gmap(d.mapQuery)}" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 border border-leaf/30 text-leaf text-xs font-bold px-3 py-2 rounded-full hover:bg-leaf/10 transition">🗺️ Google Maps</a>
+    </div>
+    <div class="mt-6 flex justify-between"><span class="text-sm text-ink-soft">${esc(d.time)}</span>
+      <div class="flex gap-2">${prev?`<button onclick="showDay(${i-1})" class="nusa-btn-ghost text-sm">← ${esc(prev.day)}</button>`:''}${next?`<button onclick="showDay(${i+1})" class="nusa-btn-ghost text-sm">${esc(next.day)} →</button>`:''}</div>
+    </div>
+  </div>`;
+}
+
+
+// ────────────── GUIA ──────────────
+const CATS=['transport','restaurant','beach','activity','tip'];
+const CAT_META={transport:{label:'Transporte',icon:'✈️'},restaurant:{label:'Restaurante',icon:'🍽️'},beach:{label:'Playa',icon:'🌴'},activity:{label:'Actividad',icon:'✨'},tip:{label:'Consejo',icon:'💡'}};
+let guiaTab='transport';
+function renderGuia(m){
+  const entries=NUSA_DATA.guide||[];
+  const byCat=c=>entries.filter(e=>e.category===c).sort((a,b)=>a.order-b.order);
+  m.innerHTML=`<div class="nusa-paper min-h-screen"><div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+    <header class="mb-8"><span class="kicker kicker-ember">Guía viva del viaje</span><h1 class="font-display text-3xl sm:text-5xl text-ink mt-2 leading-tight">Todo lo que necesitás, enlazado y a un clic</h1>
+    <p class="mt-3 text-ink-soft max-w-2xl leading-relaxed">Transportes, restaurantes, playas, actividades y consejos prácticos.</p><hr class="nusa-divider mt-5"></header>
+    <div class="flex flex-wrap gap-1.5 mb-6 p-1.5 bg-paper-2 border border-leaf/15 rounded-2xl">
+      ${CATS.map(c=>`<button onclick="guiaTab='${c}';renderGuia(document.getElementById('main'))" class="nusa-tab ${guiaTab===c?'active':''}">${CAT_META[c].icon} ${CAT_META[c].label} <span class="ml-1 text-[10px] opacity-70">${byCat(c).length}</span></button>`).join('')}
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      ${byCat(guiaTab).map(e=>`<div class="nusa-card-paper p-5 hover:shadow-lg transition">
+        <div class="flex items-center gap-2 text-ember mb-2"><span class="text-lg">${CAT_META[e.category].icon}</span><span class="kicker kicker-ember">${esc(CAT_META[e.category].label)}</span></div>
+        <h3 class="font-display text-lg text-ink leading-snug mb-2">${esc(e.title)}</h3>
+        <p class="text-sm text-ink/70 leading-relaxed mb-3">${esc(e.body)}</p>
+        <div class="flex flex-wrap gap-2 text-xs">
+          ${e.price?`<span class="badge bg-nusa-sun/15 text-nusa-sun">${esc(e.price)}</span>`:''}
+          ${e.hours?`<span class="badge bg-leaf/10 text-leaf">🕐 ${esc(e.hours)}</span>`:''}
+          ${e.wazeLink?`<a href="${esc(e.wazeLink)}" target="_blank" class="badge bg-nusa-jungle/15 text-nusa-jungle hover:underline">🧭 Waze</a>`:''}
+          ${e.mapLink?`<a href="${esc(e.mapLink)}" target="_blank" class="badge bg-nusa-teal/15 text-nusa-teal hover:underline">🗺️ Maps</a>`:''}
+          ${e.link?`<a href="${esc(e.link)}" target="_blank" class="badge bg-ember/15 text-ember hover:underline">🔗 Web</a>`:''}
+        </div></div>`).join('')}
+    </div></div></div>`;
+}
+
+// ────────────── CATALOG HELPER ──────────────
+function catalogPage(m,config){
+  // config: {title,kicker,kickerColor,data,searchPlaceholder,renderCard,renderDetail,filters}
+  const {title,kicker:kk,kickerColor:kc,data,searchPlaceholder,renderCard,renderDetail,filters}=config;
+  let search='',filtersState={};
+  filters.forEach(f=>filtersState[f.key]='');
+
+  function render(){
+    const filtered=data.filter(item=>{
+      for(const f of filters){if(filtersState[f.key]&&item[f.field]!==filtersState[f.key])return false}
+      if(search){const s=search.toLowerCase();if(!item._search||!item._search.includes(s))return false}
+      return true;
+    });
+    m.innerHTML=`<div class="nusa-paper min-h-screen"><div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+      <header class="mb-6"><span class="kicker" style="color:${kc}">${kk}</span><h1 class="font-display text-3xl sm:text-5xl text-ink mt-2 leading-tight">${title} (${data.length})</h1></header>
+      <div class="flex flex-wrap gap-3 mb-6 items-center">
+        <div class="relative flex-1 min-w-[200px]"><svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink/40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" placeholder="${searchPlaceholder}" value="${esc(search)}" class="nusa-search" oninput="this.closest('.nusa-paper').__search=this.value;this.closest('.nusa-paper').__render()"></div>
+        ${filters.map(f=>`<select class="nusa-select text-sm" onchange="this.closest('.nusa-paper').__fs['${f.key}']=this.value;this.closest('.nusa-paper').__render()"><option value="">${f.allLabel}</option>${f.options.map(o=>`<option value="${esc(o)}" ${filtersState[f.key]===o?'selected':''}>${esc(o)}</option>`).join('')}</select>`).join('')}
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        ${filtered.map((item,i)=>renderCard(item,i)).join('')}
+      </div>
+      ${filtered.length===0?'<p class="text-center text-ink/50 py-12">Sin resultados.</p>':''}
+    </div></div>`;
+    const el=m.querySelector('.nusa-paper');
+    el.__search=search;el.__fs=filtersState;
+    el.__render=()=>{search=el.__search;filtersState=el.__fs;render()};
+    el.querySelectorAll('input').forEach(inp=>{inp.value=search});
+    el.querySelectorAll('select').forEach((sel,i)=>{sel.value=filtersState[filters[i].key]});
+  }
+  // store detail renderer globally
+  window._catalogDetail=renderDetail;
+  render();
+}
+
+// ────────────── GASTRONOMIA ──────────────
+function renderGastronomia(m){
+  const items=(NUSA_DATA.gastronomia||[]).map(r=>({...r,_search:(r.name+r.cuisine+r.signatureDish).toLowerCase()}));
+  const zones=[...new Set(items.map(r=>r.region))].sort();
+  const types=[...new Set(items.map(r=>r.type))].sort();
+  catalogPage(m,{
+    title:'experiencias seleccionadas',kicker:'Gastronomía de Indonesia',kickerColor:'#e87722',
+    data:items,searchPlaceholder:'Buscar restaurante, cocina, festival...',
+    filters:[{key:'zona',field:'region',allLabel:'Todas las zonas',options:zones},{key:'tipo',field:'type',allLabel:'Todos los tipos',options:types}],
+    renderCard:(r,i)=>{
+      const ti={'Restaurante':'🍽️','Bar':'🍸','Beach Club':'🏖️','Street Food':'🍢','Festival':'🎉','Café':'☕','Espectáculo':'🎭','Zona Social':'🌃'};
+      return`<div onclick="window._catalogDetail(NUSA_DATA.gastronomia[${items.indexOf(r)}])" class="group cursor-pointer rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-lg border border-paper-2/50 transition-all">
+        <div class="h-44 bg-gradient-to-br from-nusa-jungle/20 to-nusa-teal/10 relative overflow-hidden">
+          ${r.imageUrl?`<img src="${esc(r.imageUrl)}" alt="${esc(r.name)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onerror="this.style.display='none'">`:`<div class="w-full h-full flex items-center justify-center text-5xl">${ti[r.type]||'🍽️'}</div>`}
+          <div class="absolute top-3 right-3 bg-white/90 backdrop-blur rounded-full px-2 py-0.5 text-xs font-bold text-ink">${stars(r.rating)}</div>
+          <div class="absolute bottom-3 left-3"><span class="badge text-xs bg-black/50 text-white backdrop-blur">${esc(r.type)}</span></div>
+        </div>
+        <div class="p-4"><h3 class="font-display text-lg text-ink leading-snug">${esc(r.name)}</h3><p class="text-sm text-ink/60 mt-1">${esc(r.subzone)}</p>
+          <div class="flex items-center justify-between mt-3"><span class="badge text-xs bg-leaf/10 text-leaf">${esc(r.cuisine)}</span><span class="text-nusa-sun font-bold text-sm">${priceLabel(r.priceLevel)}</span></div></div></div>`},
+    renderDetail:(r)=>{
+      const ti={'Restaurante':'🍽️','Bar':'🍸','Beach Club':'🏖️','Street Food':'🍢','Festival':'🎉','Café':'☕','Espectáculo':'🎭','Zona Social':'🌃'};
+      openSheet(`<div class="p-6"><button onclick="closeSheet()" class="float-right text-ink/40 hover:text-ink text-xl">✕</button>
+        <h2 class="font-display text-2xl text-ink pr-8">${esc(r.name)}</h2>
+        ${r.imageUrl?`<img src="${esc(r.imageUrl)}" alt="${esc(r.name)}" class="w-full h-48 object-cover rounded-lg mt-4" onerror="this.style.display='none'">`:`<div class="w-full h-48 rounded-lg mt-4 bg-gradient-to-br from-nusa-jungle/20 to-nusa-teal/10 flex items-center justify-center text-5xl">${ti[r.type]||'🍽️'}</div>`}
+        <div class="mt-4 space-y-3">
+          <div class="flex gap-2 flex-wrap"><span class="badge bg-leaf/10 text-leaf">${esc(r.zone)} · ${esc(r.subzone)}</span><span class="badge bg-ember/10 text-ember">${esc(r.cuisine)}</span><span class="badge bg-nusa-jungle/10 text-nusa-jungle">${esc(r.type)}</span></div>
+          ${r.signatureDish?`<div class="bg-nusa-sun/10 rounded-lg p-3"><p class="text-xs font-bold text-nusa-sun uppercase">Plato estrella</p><p class="mt-1 text-ink">${esc(r.signatureDish)}</p></div>`:''}
+          <p class="text-ink/80 leading-relaxed">${esc(r.description)}</p>
+          ${r.tip?`<div class="bg-paper-2 rounded-lg p-3"><p class="text-xs font-bold text-ink uppercase">Consejo</p><p class="mt-1 text-ink/70">${esc(r.tip)}</p></div>`:''}
+          <div class="flex items-center gap-2"><span class="text-nusa-sun font-bold">${priceLabel(r.priceLevel)}</span><span class="ml-auto">${stars(r.rating)}</span></div>
+          <div class="flex gap-2 pt-2">
+            ${r.wazeUrl?`<a href="${esc(r.wazeUrl)}" target="_blank" class="nusa-btn-green text-sm">📍 Waze</a>`:''}
+            ${r.webUrl?`<a href="${esc(r.webUrl)}" target="_blank" class="nusa-btn-ghost text-sm">🔗 Web</a>`:''}
+          </div></div></div>`);
+    }
+  });
+}
+
+
+// ────────────── PLAYAS ──────────────
+function renderPlayas(m){
+  const items=(NUSA_DATA.playas||[]).map(p=>({...p,_search:(p.name+p.descripcion+p.caracteristicas).toLowerCase()}));
+  const regions=[...new Set(items.map(p=>p.region))].sort();
+  const perfiles=[...new Set(items.map(p=>p.perfilPlaya).filter(Boolean))].sort();
+  const priStyle={alta:'bg-nusa-jungle text-white',media:'bg-nusa-sun text-ink',baja:'bg-ink/20 text-ink/60'};
+  catalogPage(m,{
+    title:'playas catalogadas',kicker:'Playas de Indonesia',kickerColor:'#00d5ff',
+    data:items,searchPlaceholder:'Buscar playa...',
+    filters:[{key:'region',field:'region',allLabel:'Todas las regiones',options:regions},{key:'perfil',field:'perfilPlaya',allLabel:'Todos los perfiles',options:perfiles}],
+    renderCard:(p)=>{
+      return`<div onclick="window._catalogDetail(NUSA_DATA.playas[${items.indexOf(p)}])" class="group cursor-pointer rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-lg border border-paper-2/50 transition-all">
+        <div class="h-40 bg-gradient-to-br from-nusa-teal/20 to-nusa-sea/10 relative overflow-hidden">
+          ${p.foto1?`<img src="${esc(p.foto1)}" alt="${esc(p.name)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onerror="this.style.display='none'">`:'<div class="w-full h-full flex items-center justify-center text-4xl">🏖️</div>'}
+          <div class="absolute top-3 right-3 rounded-full px-2 py-0.5 text-xs font-bold ${priStyle[p.prioridad]||'bg-ink/20'}">${esc(p.prioridad)}</div>
+        </div>
+        <div class="p-4"><h3 class="font-display text-lg text-ink leading-snug">${esc(p.name)}</h3><p class="text-sm text-ink/60 mt-1">${esc(p.zone)} · ${esc(p.subzone)}</p>
+          ${p.caracteristicas?`<div class="flex flex-wrap gap-1 mt-2">${p.caracteristicas.split(',').slice(0,3).map(c=>`<span class="badge border border-ink/15 text-ink/70 text-[10px] px-1.5 py-0">${esc(c.trim())}</span>`).join('')}</div>`:''}
+        </div></div>`},
+    renderDetail:(p)=>{
+      const fotos=[p.foto1,p.foto2,p.foto3].filter(Boolean);
+      const priColor=p.seguridad&&(p.seguridad.toLowerCase().includes('peligro')||p.seguridad.toLowerCase().includes('corriente'))?'bg-red-50 border border-red-200':'bg-paper-2';
+      const textColor=p.seguridad&&(p.seguridad.toLowerCase().includes('peligro')||p.seguridad.toLowerCase().includes('corriente'))?'text-red-800':'text-ink/70';
+      openSheet(`<div class="p-6"><button onclick="closeSheet()" class="float-right text-ink/40 hover:text-ink text-xl">✕</button>
+        <h2 class="font-display text-2xl text-ink pr-8">${esc(p.name)}</h2>
+        ${fotos[0]?`<img src="${esc(fotos[0])}" alt="${esc(p.name)}" class="w-full h-48 object-cover rounded-lg mt-4" loading="lazy">`:''}
+        ${fotos.length>1?`<div class="flex gap-2 mt-2">${fotos.slice(1).map(f=>`<img src="${esc(f)}" alt="" class="w-20 h-20 object-cover rounded-lg">`).join('')}</div>`:''}
+        <div class="mt-4 space-y-3">
+          <div class="flex gap-2 flex-wrap"><span class="badge bg-nusa-teal/10 text-nusa-teal">${esc(p.zone)}</span><span class="badge ${priStyle[p.prioridad]||'bg-ink/20'}">${esc(p.prioridad).toUpperCase()}</span>${p.perfilPlaya?`<span class="badge bg-nusa-jungle/10 text-nusa-jungle">${esc(p.perfilPlaya)}</span>`:''}</div>
+          <p class="text-ink/80 leading-relaxed">${esc(p.descripcion)}</p>
+          ${p.mejorHora?`<p><strong>Mejor hora:</strong> ${esc(p.mejorHora)}</p>`:''}
+          ${p.banio?`<p><strong>Baño:</strong> ${esc(p.banio)}</p>`:''}
+          ${p.acceso?`<p><strong>Acceso:</strong> ${esc(p.acceso)}</p>`:''}
+          ${p.caracteristicas?`<div class="flex flex-wrap gap-1">${p.caracteristicas.split(',').map(c=>`<span class="badge border border-ink/15 text-ink/70">${esc(c.trim())}</span>`).join('')}</div>`:''}
+          ${p.seguridad?`<div class="rounded-lg p-3 ${priColor}"><p class="text-xs font-bold ${textColor}">⚠️ Seguridad</p><p class="mt-1 ${textColor}">${esc(p.seguridad)}</p></div>`:''}
+          ${p.consejos?`<div class="bg-nusa-sun/10 rounded-lg p-3"><p class="text-xs font-bold text-nusa-sun">💡 Consejos</p><p class="mt-1 text-ink/80">${esc(p.consejos)}</p></div>`:''}
+          <div class="flex gap-2 pt-2">
+            ${p.wazeUrl?`<a href="${esc(p.wazeUrl)}" target="_blank" class="nusa-btn-green text-sm">📍 Waze</a>`:''}
+            ${p.googleMapsUrl?`<a href="${esc(p.googleMapsUrl)}" target="_blank" class="nusa-btn-ghost text-sm">🗺️ Google Maps</a>`:''}
+          </div></div></div>`);
+    }
+  });
+}
+
+// ────────────── ACTIVIDADES ──────────────
+let actTab='actividades';
+function renderActividades(m){
+  const acts=(NUSA_DATA.actividades||[]).map(a=>({...a,_search:(a.name+a.description).toLowerCase()}));
+  const fauna=(NUSA_DATA.fauna||[]).map(f=>({...f,_search:(f.name+f.description+f.especie).toLowerCase()}));
+  const regions=[...new Set([...acts.map(a=>a.region),...fauna.map(f=>f.region)])].sort();
+  const diffs=[...new Set(acts.map(a=>a.difficulty).filter(Boolean))].sort();
+
+  const isAct=actTab==='actividades';
+  const items=isAct?acts:fauna;
+  const search=document.getElementById('act-search')?.value||'';
+  const region=document.getElementById('act-region')?.value||'';
+  const diff=document.getElementById('act-diff')?.value||'';
+
+  const filtered=items.filter(i=>{
+    if(region&&i.region!==region)return false;
+    if(isAct&&diff&&i.difficulty!==diff)return false;
+    if(search){const s=search.toLowerCase();if(!i._search.includes(s))return false}
+    return true;
+  });
+
+  const diffColor=d=>{const l=d.toLowerCase();if(l.includes('muy alta')||l.includes('alta'))return'bg-red-100 text-red-700 border-red-200';if(l.includes('media'))return'bg-amber-100 text-amber-700 border-amber-200';return'bg-green-100 text-green-700 border-green-200'};
+
+  m.innerHTML=`<div class="nusa-paper min-h-screen"><div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+    <header class="mb-6"><span class="kicker kicker-ember">Experiencias en Indonesia</span><h1 class="font-display text-3xl sm:text-5xl text-ink mt-2 leading-tight">${acts.length+fauna.length} experiencias</h1></header>
+    <div class="flex gap-2 mb-6"><button onclick="actTab='actividades';renderActividades(document.getElementById('main'))" class="nusa-tab ${isAct?'active':''}">Actividades (${acts.length})</button><button onclick="actTab='fauna';renderActividades(document.getElementById('main'))" class="nusa-tab ${!isAct?'active':''}">Fauna (${fauna.length})</button></div>
+    <div class="flex flex-wrap gap-3 mb-6 items-center">
+      <div class="relative flex-1 min-w-[200px]"><svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink/40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input id="act-search" type="text" placeholder="Buscar..." value="${esc(search)}" class="nusa-search" oninput="renderActividades(document.getElementById('main'))"></div>
+      <select id="act-region" class="nusa-select text-sm" onchange="renderActividades(document.getElementById('main'))"><option value="">Todas las regiones</option>${regions.map(r=>`<option value="${esc(r)}" ${region===r?'selected':''}>${esc(r)}</option>`).join('')}</select>
+      ${isAct?`<select id="act-diff" class="nusa-select text-sm" onchange="renderActividades(document.getElementById('main'))"><option value="">Dificultad</option>${diffs.map(d=>`<option value="${esc(d)}" ${diff===d?'selected':''}>${esc(d)}</option>`).join('')}</select>`:''}
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      ${isAct?filtered.map((a,i)=>{
+        const photos=[a.imageUrl1,a.imageUrl2,a.imageUrl3,a.imageUrl4].filter(Boolean);
+        return`<div onclick="showActDetail(${acts.indexOf(a)})" class="group cursor-pointer rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-lg border border-paper-2/50 transition-all">
+          <div class="h-40 bg-gradient-to-br from-nusa-jungle/20 to-leaf/10 relative overflow-hidden flex">
+            ${photos[0]?`<img src="${esc(photos[0])}" alt="${esc(a.name)}" class="w-1/2 h-full object-cover">`:'<div class="w-1/2 h-full flex items-center justify-center text-3xl">🎯</div>'}
+            ${photos[1]?`<img src="${esc(photos[1])}" alt="" class="w-1/2 h-full object-cover">`:''}
+            <div class="absolute top-3 right-3 bg-white/90 backdrop-blur rounded-full px-2 py-0.5 text-xs font-bold text-ink">${stars(a.rating)}</div>
+          </div>
+          <div class="p-4"><h3 class="font-display text-lg text-ink leading-snug">${esc(a.name)}</h3><p class="text-sm text-ink/60 mt-1">${esc(a.subzone?.replace(/^\d+\.\d+\s*/,'')||a.zone?.replace(/^\d+\.\s*/,''))}</p>
+            <div class="flex items-center gap-2 mt-2 flex-wrap"><span class="badge text-xs bg-nusa-jungle/10 text-nusa-jungle">${esc(a.category)}</span><span class="badge text-xs border ${diffColor(a.difficulty)}">${esc(a.difficulty)}</span>${a.duration?`<span class="text-xs text-ink/50">🕐 ${esc(a.duration)}</span>`:''}</div>
+            ${a.priceRange?`<p class="text-sm font-bold text-nusa-jungle mt-2">${esc(a.priceRange)}</p>`:''}</div></div>`}).join('')
+      :filtered.map(f=>{
+        const fotos=[f.foto1,f.foto2,f.foto3].filter(Boolean);
+        return`<div onclick="showFaunaDetailFromAct(${fauna.indexOf(f)})" class="group cursor-pointer rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-lg border border-paper-2/50 transition-all">
+          <div class="h-40 bg-gradient-to-br from-ember/20 to-nusa-sun/10 relative overflow-hidden">
+            ${f.foto1?`<img src="${esc(f.foto1)}" alt="${esc(f.name)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">`:'<div class="w-full h-full flex items-center justify-center text-4xl">🦎</div>'}
+            <div class="absolute top-3 right-3 bg-white/90 backdrop-blur rounded-full px-2 py-0.5 text-xs font-bold text-ink">${stars(f.rating)}</div>
+          </div>
+          <div class="p-4"><h3 class="font-display text-base text-ink leading-snug">${esc(f.name)}</h3><p class="text-sm text-ink/60 mt-1">${esc(f.zone)}</p>
+            <div class="flex gap-2 mt-2 flex-wrap">${f.especie?`<span class="badge text-xs bg-leaf/10 text-leaf">${esc(f.especie)}</span>`:''}${f.familia?`<span class="badge text-xs bg-nusa-teal/10 text-nusa-teal">${esc(f.familia)}</span>`:''}</div></div></div>`}).join('')}
+    </div>
+    ${filtered.length===0?'<p class="text-center text-ink/50 py-12">Sin resultados.</p>':''}
+  </div></div>`;
+}
+
+function showActDetail(i){
+  const a=NUSA_DATA.actividades[i];if(!a)return;
+  const photos=[a.imageUrl1,a.imageUrl2,a.imageUrl3,a.imageUrl4].filter(Boolean);
+  openSheet(`<div class="p-6"><button onclick="closeSheet()" class="float-right text-ink/40 hover:text-ink text-xl">✕</button>
+    <h2 class="font-display text-xl text-ink leading-tight pr-8">🎯 ${esc(a.name)}</h2>
+    ${photos[0]?`<img src="${esc(photos[0])}" alt="${esc(a.name)}" class="w-full h-48 object-cover rounded-lg mt-4" loading="lazy">`:''}
+    <div class="mt-4 space-y-3">
+      <div class="flex gap-2 flex-wrap"><span class="badge bg-nusa-jungle/10 text-nusa-jungle">${esc(a.category)}</span><span class="badge bg-nusa-teal/10 text-nusa-teal">${esc(a.region)}</span></div>
+      <p class="text-ink/80 leading-relaxed text-sm">${esc(a.description)}</p>
+      ${a.priceRange?`<div class="rounded-lg border border-ink/10 p-3 bg-paper-2"><p class="text-xs font-bold text-ink/60 uppercase">💰 Precio</p><p class="text-sm font-bold text-nusa-jungle">${esc(a.priceRange)}</p></div>`:''}
+      ${a.duration?`<p>🕐 <strong>Duración:</strong> ${esc(a.duration)}</p>`:''}
+      ${a.logistica?`<p>🚗 <strong>Cómo llegar:</strong> ${esc(a.logistica)}</p>`:''}
+      ${a.consejos?`<div class="bg-nusa-sun/10 rounded-lg p-3"><p class="text-xs font-bold text-ink/60 uppercase">💡 Consejos</p><p class="mt-1 text-sm text-ink/80">${esc(a.consejos)}</p></div>`:''}
+      ${a.seguridad?`<div class="bg-red-50 border border-red-200 rounded-lg p-3"><p class="text-xs font-bold text-red-700">⚠️ Seguridad</p><p class="mt-1 text-sm text-red-800">${esc(a.seguridad)}</p></div>`:''}
+      <div class="flex gap-2 pt-2">${a.wazeUrl?`<a href="${esc(a.wazeUrl)}" target="_blank" class="nusa-btn-green text-sm">📍 Waze</a>`:''}${a.webUrl?`<a href="${esc(a.webUrl)}" target="_blank" class="nusa-btn-ghost text-sm">🗺️ Maps</a>`:''}</div>
+    </div></div>`);
+}
+function showFaunaDetailFromAct(i){showFaunaDetail(i)}
+
+
+// ────────────── ELEFANTES ──────────────
+function renderElefantes(m){
+  const items=(NUSA_DATA.elefantes||[]).map(e=>({...e,_search:(e.name+e.description).toLowerCase()}));
+  const regions=[...new Set(items.map(e=>e.region))].sort();
+  const search=document.getElementById('elef-search')?.value||'';
+  const region=document.getElementById('elef-region')?.value||'';
+  const filtered=items.filter(e=>{
+    if(region&&e.region!==region)return false;
+    if(search){const s=search.toLowerCase();if(!e._search.includes(s))return false}
+    return true;
+  });
+  m.innerHTML=`<div class="nusa-paper min-h-screen"><div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+    <header class="mb-6"><span class="kicker kicker-ember">Experiencias con elefantes</span><h1 class="font-display text-3xl sm:text-5xl text-ink mt-2 leading-tight">${items.length} encuentros</h1></header>
+    <div class="flex flex-wrap gap-3 mb-6 items-center">
+      <div class="relative flex-1 min-w-[200px]"><svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink/40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input id="elef-search" type="text" placeholder="Buscar experiencia..." value="${esc(search)}" class="nusa-search" oninput="renderElefantes(document.getElementById('main'))"></div>
+      <select id="elef-region" class="nusa-select text-sm" onchange="renderElefantes(document.getElementById('main'))"><option value="">Todas las regiones</option>${regions.map(r=>`<option value="${esc(r)}" ${region===r?'selected':''}>${esc(r)}</option>`).join('')}</select>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      ${filtered.map((e,i)=>{
+        const hasFicha=!!(e.precio1Dia||e.nivelRespeto||e.opinionPositiva);
+        const respColor=e.nivelRespeto?.toLowerCase().includes('alto')?'bg-green-100 text-green-700':e.nivelRespeto?.toLowerCase().includes('medio')?'bg-amber-100 text-amber-700':'bg-red-100 text-red-700';
+        return`<div onclick="showElefDetail(${items.indexOf(e)})" class="group cursor-pointer rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-lg border border-paper-2/50 transition-all">
+          <div class="h-40 bg-gradient-to-br from-ember/20 to-nusa-sun/10 relative overflow-hidden">
+            ${e.foto1?`<img src="${esc(e.foto1)}" alt="${esc(e.name)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">`:'<div class="w-full h-full flex items-center justify-center text-5xl">🐘</div>'}
+            <div class="absolute top-3 right-3 bg-white/90 backdrop-blur rounded-full px-2 py-0.5 text-xs font-bold text-ink">${stars(e.rating)}</div>
+            ${hasFicha?`<div class="absolute top-3 left-3 bg-ember/90 text-white rounded-full px-2 py-0.5 text-xs font-bold">Ficha completa</div>`:''}
+          </div>
+          <div class="p-4"><h3 class="font-display text-lg text-ink leading-snug">${esc(e.name)}</h3><p class="text-sm text-ink/60 mt-1">${esc(e.zone)}${e.subzone?' · '+esc(e.subzone):''}</p>
+            <div class="flex gap-2 mt-2 flex-wrap"><span class="badge text-xs bg-ember/10 text-ember">${esc(e.tipoActividad||'Experiencia')}</span>${e.nivelRespeto?`<span class="badge text-xs border ${respColor}">${esc(e.nivelRespeto.split('/')[0].trim())}</span>`:''}</div></div></div>`}).join('')}
+    </div>${filtered.length===0?'<p class="text-center text-ink/50 py-12">Sin resultados.</p>':''}
+  </div></div>`;
+}
+function showElefDetail(i){
+  const e=NUSA_DATA.elefantes[i];if(!e)return;
+  const fotos=[e.foto1,e.foto2,e.foto3].filter(Boolean);
+  const hasFicha=!!(e.precio1Dia||e.nivelRespeto||e.opinionPositiva);
+  const respColor=e.nivelRespeto?.toLowerCase().includes('alto')?'bg-green-100 text-green-700 border-green-200':e.nivelRespeto?.toLowerCase().includes('medio')?'bg-amber-100 text-amber-700 border-amber-200':'bg-red-100 text-red-700 border-red-200';
+  openSheet(`<div class="p-6"><button onclick="closeSheet()" class="float-right text-ink/40 hover:text-ink text-xl">✕</button>
+    <h2 class="font-display text-xl sm:text-2xl text-ink leading-tight pr-8">🐘 ${esc(e.name)}</h2>
+    ${fotos[0]?`<img src="${esc(fotos[0])}" alt="${esc(e.name)}" class="w-full h-48 object-cover rounded-lg mt-4">`:`<div class="w-full h-48 bg-gradient-to-br from-ember/20 to-nusa-sun/10 rounded-lg mt-4 flex items-center justify-center text-6xl">🐘</div>`}
+    <div class="mt-4 space-y-3">
+      <div class="flex gap-2 flex-wrap"><span class="badge bg-ember/10 text-ember">${esc(e.tipoActividad||'Experiencia')}</span><span class="badge bg-nusa-jungle/10 text-nusa-jungle">${esc(e.region)}</span></div>
+      <p class="text-ink/80 leading-relaxed text-sm">${esc(e.description)}</p>
+      ${hasFicha?`
+        ${e.nivelRespeto?`<div class="rounded-lg border p-3 ${respColor}"><p class="text-xs font-bold uppercase mb-1">💚 Nivel de respeto animal</p><p class="text-sm">${esc(e.nivelRespeto)}</p></div>`:''}
+        ${(e.precio1Dia||e.precio2Dias)?`<div class="rounded-lg border border-ink/10 p-3 bg-paper-2"><p class="text-xs font-bold text-ink/60 uppercase">💰 Precios orientativos</p>${e.precio1Dia?`<p class="text-sm mt-1"><span class="text-ink/50">1 día:</span> ${esc(e.precio1Dia)}</p>`:''}${e.precio2Dias?`<p class="text-sm"><span class="text-ink/50">2 días:</span> ${esc(e.precio2Dias)}</p>`:''}</div>`:''}
+        ${e.logistica?`<p class="text-sm">🚗 <strong>Cómo llegar:</strong> ${esc(e.logistica)}</p>`:''}
+        ${e.opinionPositiva?`<div class="flex gap-2 text-sm"><span class="text-green-600">👍</span><p class="text-ink/80">${esc(e.opinionPositiva)}</p></div>`:''}
+        ${e.opinionNegativa?`<div class="flex gap-2 text-sm"><span class="text-red-500">👎</span><p class="text-ink/70">${esc(e.opinionNegativa)}</p></div>`:''}
+        ${e.consejos?`<div class="bg-nusa-sun/10 rounded-lg p-3"><p class="text-xs font-bold text-ink/60 uppercase">💡 Consejos</p><p class="mt-1 text-sm text-ink/80">${esc(e.consejos)}</p></div>`:''}
+        ${e.peligro?`<div class="bg-red-50 border border-red-200 rounded-lg p-3"><p class="text-xs font-bold text-red-700">⚠️ Riesgos</p><p class="mt-1 text-sm text-red-800">${esc(e.peligro)}</p></div>`:''}
+      `:`
+        ${e.queVer?`<p><strong>Qué ver:</strong> ${esc(e.queVer)}</p>`:''}
+        ${e.mejorEpoca?`<p><strong>Mejor época:</strong> ${esc(e.mejorEpoca)}</p>`:''}
+        ${e.peligro?`<div class="bg-red-50 border border-red-200 rounded-lg p-3"><p class="text-xs font-bold text-red-700">⚠️ Seguridad</p><p class="mt-1 text-sm text-red-800">${esc(e.peligro)}</p></div>`:''}
+      `}
+      <div class="mt-2">${stars(e.rating)}</div>
+      <div class="flex gap-2 pt-2">${e.wazeUrl?`<a href="${esc(e.wazeUrl)}" target="_blank" class="nusa-btn-green text-sm">📍 Waze</a>`:''}${e.webUrl?`<a href="${esc(e.webUrl)}" target="_blank" class="nusa-btn-ghost text-sm">🗺️ Maps</a>`:''}</div>
+    </div></div>`);
+}
+
+// ────────────── FAUNA ──────────────
+function renderFauna(m){
+  const items=(NUSA_DATA.fauna||[]).map(f=>({...f,_search:(f.name+f.description+f.especie).toLowerCase()}));
+  const regions=[...new Set(items.map(f=>f.region))].sort();
+  const diffs=[...new Set(items.map(f=>f.dificultad).filter(Boolean))].sort();
+  const search=document.getElementById('fauna-search')?.value||'';
+  const region=document.getElementById('fauna-region')?.value||'';
+  const diff=document.getElementById('fauna-diff')?.value||'';
+  const filtered=items.filter(f=>{
+    if(region&&f.region!==region)return false;
+    if(diff&&f.dificultad!==diff)return false;
+    if(search){const s=search.toLowerCase();if(!f._search.includes(s))return false}
+    return true;
+  });
+  function emoji(fam){const f=(fam||'').toLowerCase();if(f.includes('primate')||f.includes('mono'))return'🐒';if(f.includes('ave'))return'🦜';if(f.includes('marina')||f.includes('snorkel')||f.includes('manta')||f.includes('buceo'))return'🐠';if(f.includes('tortuga'))return'🐢';if(f.includes('elefante'))return'🐘';if(f.includes('mariposa'))return'🦋';if(f.includes('murciélago')||f.includes('volador'))return'🦇';return'🦎'}
+  m.innerHTML=`<div class="nusa-paper min-h-screen"><div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+    <header class="mb-6"><span class="kicker kicker-ember">Fauna de Indonesia</span><h1 class="font-display text-3xl sm:text-5xl text-ink mt-2 leading-tight">🐾 ${items.length} experiencias</h1></header>
+    <div class="flex flex-wrap gap-3 mb-6 items-center">
+      <div class="relative flex-1 min-w-[200px]"><svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink/40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input id="fauna-search" type="text" placeholder="Buscar especie o actividad..." value="${esc(search)}" class="nusa-search" oninput="renderFauna(document.getElementById('main'))"></div>
+      <select id="fauna-region" class="nusa-select text-sm" onchange="renderFauna(document.getElementById('main'))"><option value="">Todas las regiones</option>${regions.map(r=>`<option value="${esc(r)}" ${region===r?'selected':''}>${esc(r)}</option>`).join('')}</select>
+      <select id="fauna-diff" class="nusa-select text-sm" onchange="renderFauna(document.getElementById('main'))"><option value="">Dificultad</option>${diffs.map(d=>`<option value="${esc(d)}" ${diff===d?'selected':''}>${esc(d)}</option>`).join('')}</select>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      ${filtered.map((f,i)=>`<div onclick="showFaunaDetail(${items.indexOf(f)})" class="group cursor-pointer rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-lg border border-paper-2/50 transition-all">
+        <div class="h-40 bg-gradient-to-br from-ember/20 to-nusa-sun/10 relative overflow-hidden">
+          ${f.foto1?`<img src="${esc(f.foto1)}" alt="${esc(f.name)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">`:`<div class="w-full h-full flex items-center justify-center text-5xl">${emoji(f.familia)}</div>`}
+          <div class="absolute top-3 right-3 bg-white/90 backdrop-blur rounded-full px-2 py-0.5 text-xs font-bold text-ink">${stars(f.rating)}</div>
+        </div>
+        <div class="p-4"><h3 class="font-display text-base text-ink leading-snug">${esc(f.name)}</h3><p class="text-sm text-ink/60 mt-1">${esc(f.zone)} · ${esc(f.subzone)}</p>
+          <div class="flex gap-2 mt-2 flex-wrap"><span class="badge text-xs bg-ember/10 text-ember">${esc(f.tipoActividad||'Fauna')}</span>${f.duration?`<span class="text-xs text-ink/50">🕐 ${esc(f.duration)}</span>`:''}</div></div></div>`).join('')}
+    </div>${filtered.length===0?'<p class="text-center text-ink/50 py-12">Sin resultados.</p>':''}
+  </div></div>`;
+}
+function showFaunaDetail(i){
+  const f=NUSA_DATA.fauna[i];if(!f)return;
+  const fotos=[f.foto1,f.foto2,f.foto3].filter(Boolean);
+  function emoji(fam){const fa=(fam||'').toLowerCase();if(fa.includes('primate')||fa.includes('mono'))return'🐒';if(fa.includes('ave'))return'🦜';if(fa.includes('marina')||fa.includes('snorkel'))return'🐠';if(fa.includes('tortuga'))return'🐢';return'🦎'}
+  openSheet(`<div class="p-6"><button onclick="closeSheet()" class="float-right text-ink/40 hover:text-ink text-xl">✕</button>
+    <h2 class="font-display text-2xl text-ink pr-8">${emoji(f.familia)} ${esc(f.name)}</h2>
+    ${fotos[0]?`<img src="${esc(fotos[0])}" alt="${esc(f.name)}" class="w-full h-52 object-cover rounded-lg mt-4">`:`<div class="w-full h-52 bg-gradient-to-br from-ember/20 to-nusa-sun/10 rounded-lg mt-4 flex items-center justify-center text-6xl">${emoji(f.familia)}</div>`}
+    <div class="mt-4 space-y-3">
+      <div class="flex gap-2 flex-wrap"><span class="badge bg-ember/10 text-ember">${esc(f.tipoActividad||'Fauna')}</span><span class="badge bg-nusa-jungle/10 text-nusa-jungle">${esc(f.dificultad)}</span><span class="badge bg-nusa-teal/10 text-nusa-teal">${esc(f.zone)}</span></div>
+      <p class="text-ink/80 leading-relaxed">${esc(f.description)}</p>
+      ${f.queVer?`<p><strong>Fauna objetivo:</strong> ${esc(f.queVer)}</p>`:''}
+      ${f.mejorEpoca?`<p><strong>Mejor época:</strong> ${esc(f.mejorEpoca)}</p>`:''}
+      ${f.duration?`<p>🕐 <strong>Duración:</strong> ${esc(f.duration)}</p>`:''}
+      ${f.peligro?`<div class="bg-red-50 border border-red-200 rounded-lg p-3"><p class="text-xs font-bold text-red-700">⚠️ Seguridad</p><p class="mt-1 text-sm text-red-800">${esc(f.peligro)}</p></div>`:''}
+      <div>${stars(f.rating)}</div>
+      <div class="flex gap-2 pt-2">${f.wazeUrl?`<a href="${esc(f.wazeUrl)}" target="_blank" class="nusa-btn-green text-sm">📍 Mapa</a>`:''}${f.webUrl?`<a href="${esc(f.webUrl)}" target="_blank" class="nusa-btn-ghost text-sm">🔗 Fuente</a>`:''}</div>
+    </div></div>`);
+}
+
+
+// ────────────── MAPA ──────────────
+let leafletMap=null;
+function renderMapa(m){
+  const days=NUSA_DATA.days||[],trip=NUSA_DATA.trip;
+  if(!trip){m.innerHTML=`<div class="nusa-shell-bg text-nusa-mist min-h-screen"><div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8"><span class="kicker kicker-sun">Mapa · Indonesia</span><h1 class="font-display text-3xl sm:text-5xl text-white mt-2 leading-tight">Tu ruta vista desde el cielo</h1><p class="mt-3 text-white/70 max-w-2xl">Aquí verás la ruta con pines navegables y enlaces a Waze cuando se genera el itinerario.</p></div></div>`;return}
+  const points=days.filter(d=>d.coordsLat!=null&&d.coordsLng!=null);
+  m.innerHTML=`<div class="nusa-shell-bg text-nusa-mist min-h-screen"><div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <header class="mb-6"><span class="kicker kicker-sun">Mapa · Indonesia</span><h1 class="font-display text-3xl sm:text-5xl text-white mt-2 leading-tight">La ruta de los ${days.length} días</h1></header>
+    <div class="grid lg:grid-cols-[1fr_360px] gap-4">
+      <div class="nusa-panel p-2 h-[460px] sm:h-[560px]"><div id="leaflet-map" class="w-full h-full rounded-[18px] overflow-hidden"></div></div>
+      <aside class="nusa-panel p-4 flex flex-col max-h-[560px]">
+        <div class="flex items-center gap-2 text-nusa-sun mb-1">🗺️ <span class="kicker kicker-sun">Puntos de la ruta</span></div>
+        <div class="text-[11px] text-white/50 mb-3">${points.length} días con coordenadas</div>
+        <div class="flex-1 overflow-y-auto nusa-scroll pr-1 space-y-2">
+          ${points.map((d,i)=>`<button onclick="mapGoTo(${d.coordsLat},${d.coordsLng},'${esc(d.day)} · ${esc(d.zone)}','${esc(d.title)}','${esc(d.transport)}','${esc(d.cost)}','${esc(d.advice)}','${esc(d.wazeQuery||d.mapQuery)}',${d.coordsLat},${d.coordsLng})" class="w-full text-left rounded-xl border p-3 transition border-white/10 bg-white/5 hover:bg-white/10">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full grid place-items-center text-[11px] font-black bg-nusa-jungle/30 text-nusa-jungle-2">${d.day}</span>
+              <div class="min-w-0 flex-1"><div class="text-[11px] uppercase tracking-wider text-white/60 font-bold">${esc(d.zone)}</div><div class="text-sm text-white font-bold truncate">${esc(d.title)}</div></div>
+            </div></button>`).join('')}
+        </div>
+        <div class="mt-3 flex items-start gap-2 text-[11px] text-white/45 leading-relaxed">
+          📥 Descarga la región en la app de Waze antes de viajar para usarlo sin conexión.
+        </div>
+      </aside>
+    </div></div></div>`;
+
+  // Init Leaflet
+  setTimeout(()=>{
+    const el=document.getElementById('leaflet-map');if(!el||leafletMap){leafletMap=L.map('leaflet-map',{zoomControl:true}).setView([-8.3,115.2],9);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:19}).addTo(leafletMap);
+    }else{leafletMap.invalidateSize()}
+    // Add markers
+    points.forEach((d,i)=>{
+      const icon=L.divIcon({className:'',html:`<div style="width:18px;height:18px;border-radius:50%;background:${i===0?'#ff4b2f':'#0b3d2e'};border:3px solid #fff;box-shadow:0 6px 14px rgba(0,0,0,.4)"></div>`,iconSize:[18,18],iconAnchor:[9,9]});
+      L.marker([d.coordsLat,d.coordsLng],{icon}).addTo(leafletMap).bindPopup(`<strong>${esc(d.day)} · ${esc(d.zone)}</strong><br>${esc(d.title)}<br><a href="${wazeNav(d.wazeQuery||d.mapQuery)}" target="_blank" style="color:#00d5ff">Abrir en Waze →</a>`);
+    });
+    if(points.length)leafletMap.fitBounds(points.map(d=>[d.coordsLat,d.coordsLng]),{padding:[40,40]});
+  },100);
+}
+function mapGoTo(lat,lng,zone,title,transport,cost,advice,wq,wlat,wdng){
+  if(leafletMap)leafletMap.setView([lat,lng],14);
+  openSheet(`<div class="p-6" style="background:#061a14;color:#f7fff7"><button onclick="closeSheet()" class="float-right text-white/40 hover:text-white text-xl">✕</button>
+    <div class="flex items-center gap-2 text-nusa-sun"><span class="kicker kicker-sun">${esc(zone)}</span></div>
+    <h2 class="font-display text-lg text-white mt-1.5">${esc(title)}</h2>
+    <div class="mt-2 text-xs text-white/70 space-y-1">
+      <div><span class="text-white/45">Transporte:</span> ${esc(transport)}</div>
+      <div><span class="text-white/45">Coste:</span> ${esc(cost)}</div>
+      <div class="leading-relaxed pt-1 text-white/60">${esc(advice)}</div>
+    </div>
+    <div class="mt-3 flex flex-wrap gap-2">
+      <a href="${wazeNav(wq)}" target="_blank" class="nusa-btn-green text-sm">🧭 Waze</a>
+      <a href="${wazeCoord(wlat,wdng)}" target="_blank" class="inline-flex items-center gap-1 border border-white/25 text-white text-xs font-bold px-3 py-2 rounded-full hover:bg-white/10">📍 Ruta Waze</a>
+      <a href="${gmap(wq)}" target="_blank" class="inline-flex items-center gap-1 border border-white/25 text-white text-xs font-bold px-3 py-2 rounded-full hover:bg-white/10">🗺️ Google Maps</a>
+    </div></div>`);
+}
+
+// ────────────── SUGERENCIAS ──────────────
+function renderSugerencias(m){
+  const suggs=NUSA_DATA.suggs||[];
+  const statusStyle={pending:'bg-nusa-sun/20 text-nusa-sun',applied:'bg-nusa-jungle/20 text-nusa-jungle',rejected:'bg-nusa-coral/20 text-nusa-coral'};
+  const statusLabel={pending:'Pendiente',applied:'Aplicada',rejected:'Rechazada'};
+  m.innerHTML=`<div class="nusa-paper min-h-screen"><div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+    <header class="mb-8"><span class="kicker kicker-ember">Zona de Izan & Iria</span><h1 class="font-display text-3xl sm:text-5xl text-ink mt-2 leading-tight">Lo que vais encontrando por ahí</h1>
+    <p class="mt-3 text-ink-soft max-w-2xl leading-relaxed">Aportaciones de Instagram, hoteles, fotos y actividades. (Modo lectura — para enviar nuevas sugerencias usa la versión completa).</p><hr class="nusa-divider mt-5"></header>
+    <div class="grid sm:grid-cols-2 gap-3">
+      ${suggs.map(s=>`<div class="nusa-card-paper p-5">
+        <div class="flex items-center justify-between mb-2">
+          <span class="badge ${statusStyle[s.status]||'bg-ink/10 text-ink/60'}">${statusLabel[s.status]||s.status}</span>
+          <span class="text-xs text-ink/50">${esc(s.author)} · ${new Date(s.createdAt).toLocaleDateString('es-ES')}</span>
+        </div>
+        ${s.source?`<p class="text-xs text-ember font-bold mb-1">${esc(s.source)}</p>`:''}
+        <p class="text-sm text-ink/80 leading-relaxed">${esc(s.content)}</p>
+        ${s.sourceUrl?`<a href="${esc(s.sourceUrl)}" target="_blank" class="text-xs text-nusa-teal hover:underline mt-2 inline-block">🔗 Ver fuente</a>`:''}
+      </div>`).join('')}
+    </div>
+    ${suggs.length===0?'<div class="nusa-card-paper p-10 text-center text-ink-soft mt-4">No hay aportaciones todavía.</div>':''}
+  </div></div>`;
+}
+
+// ────────────── RESUMEN ──────────────
+function renderResumen(m){
+  const trip=NUSA_DATA.trip,days=NUSA_DATA.days||[],suggs=NUSA_DATA.suggs||[];
+  if(!trip){m.innerHTML=`<div class="nusa-paper min-h-screen"><div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10"><span class="kicker kicker-ember">Resumen y decisión</span><h1 class="font-display text-3xl sm:text-5xl text-ink mt-2 leading-tight">La foto final del viaje</h1><hr class="nusa-divider mt-5"><div class="nusa-card-paper p-10 text-center text-ink-soft mt-8">No hay viaje generado. Esta versión es de solo lectura.</div></div></div>`;return}
+  const zones=[...new Set(days.map(d=>d.zone.split('·')[0].trim()))];
+  const appliedCount=suggs.filter(s=>s.status==='applied').length;
+  m.innerHTML=`<div class="nusa-paper min-h-screen"><div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+    <header class="mb-8"><span class="kicker kicker-ember">Resumen y decisión</span><h1 class="font-display text-3xl sm:text-5xl text-ink mt-2 leading-tight">${esc(trip.title)}</h1>
+    <p class="mt-3 text-ink-soft max-w-2xl leading-relaxed">La foto final del viaje: fechas, viajeros, presupuesto, ritmo y la ruta comprimida.</p><hr class="nusa-divider mt-5"></header>
+    <div class="rounded-3xl p-6 sm:p-8 mb-8 text-white relative overflow-hidden" style="background:linear-gradient(135deg,#0b3d2e 0%,#16604a 45%,#e87722 120%)">
+      <div class="relative z-[1]"><div class="flex items-center gap-2 text-nusa-sun">✨ <span class="kicker kicker-sun">Veredicto del viaje</span></div>
+      <h2 class="font-display text-2xl sm:text-3xl mt-2 leading-tight max-w-2xl">Un viaje que mezcla selva, mar y montaña.</h2>
+      <p class="mt-3 text-white/85 max-w-2xl leading-relaxed">Todo enlazado a Waze, con días colchón para respirar y un presupuesto equilibrado.</p>
+      <div class="mt-5 flex flex-wrap gap-2">
+        ${zones.map(z=>`<span class="inline-flex items-center gap-1 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-xs font-bold">✓ ${esc(z)}</span>`).join('')}
+      </div></div>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      ${[['📅','Fechas',trip.dates],['👥','Viajeros',trip.travellers],['💰','Presupuesto',trip.budget],['⚡','Ritmo',trip.pace],['🗺️','Ruta',zones.join(' → ')],['📬','Sugerencias aplicadas',appliedCount+' aportaciones']].map(([icon,label,value])=>
+        `<div class="nusa-card-paper p-5"><div class="flex items-center gap-2 text-ember"><span>${icon}</span><span class="kicker kicker-ember">${label}</span></div><div class="mt-2 text-ink font-display text-base sm:text-lg leading-snug">${esc(value)}</div></div>`).join('')}
+    </div>
+    ${trip.musts?`<div class="nusa-leaf-box mt-6"><div class="flex items-center gap-2 text-nusa-sun">✨ <span class="kicker kicker-sun">Imprescindibles</span></div><p class="mt-2 text-white/90 leading-relaxed">${esc(trip.musts)}</p></div>`:''}
+    <div class="mt-8 flex flex-wrap gap-3 nusa-no-print">
+      <button onclick="downloadTxt()" class="nusa-btn-ember inline-flex items-center gap-2">📥 Descargar resumen</button>
+      <button onclick="window.print()" class="nusa-btn-ghost inline-flex items-center gap-2">🖨️ Imprimir / PDF</button>
+    </div></div></div>`;
+}
+function downloadTxt(){
+  const trip=NUSA_DATA.trip,days=NUSA_DATA.days||[],suggs=NUSA_DATA.suggs||[];
+  const lines=['NUSA TRAVEL OS — RESUMEN DEL VIAJE','='.repeat(48),'',
+    'Título: '+trip.title,'Destino: '+trip.destination,'Fechas: '+trip.dates,'Viajeros: '+trip.travellers,'Presupuesto: '+trip.budget,'Ritmo: '+trip.pace,'Imprescindibles: '+trip.musts,'','ITINERARIO DÍA A DÍA','-'.repeat(48)];
+  days.forEach(d=>{lines.push('','Día '+d.day+' · '+d.zone+' — '+d.title,'  Mañana:    '+d.morning,'  Comida:    '+d.lunch,'  Tarde:     '+d.afternoon,'  Noche:     '+d.night,'  Transporte: '+d.transport,'  Coste:      '+d.cost,'  Consejo:    '+d.advice)});
+  lines.push('','Sugerencias aplicadas: '+suggs.filter(s=>s.status==='applied').length,'','Generado por Nusa Travel OS');
+  const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='nusa-travel-resumen.txt';a.click();
+}
+
+// ────────────── INIT ──────────────
+buildNav();
+renderPage();
+</script>
+</body>
+</html>

@@ -1,0 +1,541 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-manrope);
+  --font-mono: var(--font-manrope);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Nusa brand palette */
+  --color-nusa-ink: #041813;
+  --color-nusa-forest: #06281d;
+  --color-nusa-jungle: #00c875;
+  --color-nusa-jungle-2: #08f084;
+  --color-nusa-teal: #00d5ff;
+  --color-nusa-sea: #0067ff;
+  --color-nusa-sun: #ffd400;
+  --color-nusa-coral: #ff4b2f;
+  --color-nusa-pink: #ff2d55;
+  --color-nusa-mist: #f7fff7;
+
+  /* Editorial (guidebook) palette */
+  --color-paper: #fdfcf8;
+  --color-paper-2: #f4f1e9;
+  --color-ink: #0b2a23;
+  --color-ink-soft: #1a3a30;
+  --color-sand: #c9b896;
+  --color-ember: #e87722;
+  --color-ember-soft: #f3a653;
+  --color-leaf: #0b3d2e;
+  --color-leaf-2: #16604a;
+  --color-moss: #2f7a52;
+}
+
+:root {
+  --radius: 0.75rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ============ Nusa Travel OS — custom design system ============ */
+
+/* Shell (dark) background with tropical radial glows */
+.nusa-shell-bg {
+  background:
+    radial-gradient(circle at 12% 12%, rgba(0, 213, 255, 0.22), transparent 30%),
+    radial-gradient(circle at 90% 6%, rgba(255, 212, 0, 0.18), transparent 26%),
+    radial-gradient(circle at 80% 92%, rgba(255, 75, 47, 0.20), transparent 32%),
+    linear-gradient(135deg, #03100b 0%, #052817 42%, #001c28 100%);
+}
+
+.nusa-grain {
+  position: relative;
+}
+.nusa-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 54px);
+  mix-blend-mode: overlay;
+}
+
+/* Editorial paper pages */
+.nusa-paper {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+.nusa-paper-2 {
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+}
+
+/* Typography helpers */
+.font-display {
+  font-family: var(--font-playfair), Georgia, serif;
+}
+.font-body {
+  font-family: var(--font-manrope), system-ui, sans-serif;
+}
+
+.kicker {
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 800;
+  font-size: 11px;
+}
+.kicker-sun { color: var(--color-nusa-sun); }
+.kicker-ember { color: var(--color-ember); }
+.kicker-leaf { color: var(--color-leaf); }
+
+/* Pill nav */
+.nusa-nav-pill {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+  padding: 7px 11px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 11.5px;
+  white-space: nowrap;
+  transition: 0.18s ease;
+}
+.nusa-nav-pill:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+.nusa-nav-pill.active {
+  background: linear-gradient(135deg, var(--color-nusa-jungle), var(--color-nusa-teal));
+  color: #03110d;
+  border-color: transparent;
+  box-shadow: 0 10px 26px rgba(0, 213, 255, 0.22);
+}
+
+/* Chips */
+.nusa-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 11px;
+  border: 1px solid rgba(0, 240, 132, 0.32);
+  background: rgba(0, 200, 117, 0.14);
+  color: #dffff3;
+}
+.nusa-chip-sun { background: rgba(255, 212, 0, 0.18); border-color: rgba(255, 212, 0, 0.5); color: #fff9c8; }
+.nusa-chip-coral { background: rgba(255, 75, 47, 0.18); border-color: rgba(255, 75, 47, 0.5); color: #ffd7d1; }
+.nusa-chip-blue { background: rgba(0, 213, 255, 0.18); border-color: rgba(0, 213, 255, 0.5); color: #d3f8ff; }
+.nusa-chip-leaf { background: rgba(11, 61, 46, 0.10); border-color: rgba(11, 61, 46, 0.25); color: var(--color-leaf); }
+
+/* Buttons */
+.nusa-btn-primary {
+  border: 0;
+  background: linear-gradient(135deg, var(--color-nusa-coral), var(--color-nusa-sun) 45%, var(--color-nusa-jungle));
+  color: #06120c;
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-weight: 900;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.28);
+  transition: 0.18s ease;
+  cursor: pointer;
+}
+.nusa-btn-primary:hover { transform: translateY(-2px) scale(1.01); }
+.nusa-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.nusa-btn-secondary {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.10);
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-weight: 900;
+  transition: 0.18s ease;
+  cursor: pointer;
+}
+.nusa-btn-secondary:hover { background: rgba(255, 255, 255, 0.18); }
+
+.nusa-btn-ghost {
+  border: 1px solid rgba(11, 42, 35, 0.18);
+  background: transparent;
+  color: var(--color-ink);
+  padding: 11px 18px;
+  border-radius: 999px;
+  font-weight: 800;
+  transition: 0.18s ease;
+  cursor: pointer;
+}
+.nusa-btn-ghost:hover { background: rgba(11, 61, 46, 0.08); }
+
+.nusa-btn-ember {
+  border: 0;
+  background: linear-gradient(135deg, var(--color-ember), var(--color-ember-soft));
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-weight: 900;
+  box-shadow: 0 14px 30px rgba(232, 119, 34, 0.32);
+  transition: 0.18s ease;
+  cursor: pointer;
+}
+.nusa-btn-ember:hover { transform: translateY(-2px) scale(1.01); }
+.nusa-btn-ember:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* Glass panel (dark) */
+.nusa-panel {
+  background: linear-gradient(145deg, rgba(4, 32, 21, 0.9), rgba(2, 17, 31, 0.84));
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.36);
+  border-radius: 26px;
+}
+
+/* Editorial card (light) */
+.nusa-card-paper {
+  background: #fff;
+  border: 1px solid rgba(11, 61, 46, 0.12);
+  border-radius: 18px;
+  box-shadow: 0 12px 32px rgba(11, 61, 46, 0.08);
+}
+
+/* Editorial dividers (orange) */
+.nusa-divider {
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-ember), var(--color-ember-soft) 60%, transparent);
+  border: 0;
+  border-radius: 2px;
+}
+.nusa-divider-thin {
+  height: 1px;
+  background: var(--color-ember);
+  opacity: 0.7;
+  border: 0;
+}
+
+/* Leaf (green) info box like the Maldives template */
+.nusa-leaf-box {
+  background: var(--color-leaf);
+  color: #fff;
+  border-radius: 16px;
+  padding: 18px 20px;
+}
+.nusa-leaf-box h4 { color: #fff; }
+.nusa-leaf-box a { color: #ffe9b8; text-decoration: underline; }
+
+/* Star rating */
+.nusa-stars {
+  color: var(--color-ember);
+  letter-spacing: 2px;
+}
+
+/* Pager dots */
+.nusa-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.28);
+  padding: 0;
+  transition: 0.18s ease;
+  cursor: pointer;
+}
+.nusa-dot.active {
+  width: 30px;
+  background: linear-gradient(90deg, var(--color-nusa-sun), var(--color-nusa-jungle));
+}
+
+/* Custom scrollbar */
+.nusa-scroll::-webkit-scrollbar { width: 10px; height: 10px; }
+.nusa-scroll::-webkit-scrollbar-thumb { background: linear-gradient(var(--color-nusa-jungle), var(--color-nusa-teal)); border-radius: 20px; }
+.nusa-scroll::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.06); border-radius: 20px; }
+.nusa-scroll-paper::-webkit-scrollbar { width: 10px; height: 10px; }
+.nusa-scroll-paper::-webkit-scrollbar-thumb { background: var(--color-leaf); border-radius: 20px; }
+.nusa-scroll-paper::-webkit-scrollbar-track { background: rgba(11, 61, 46, 0.08); border-radius: 20px; }
+
+/* Leaflet popup dark theming */
+.leaflet-container { background: #0a1d14; font-family: var(--font-manrope), sans-serif; }
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+  background: #061a14;
+  color: #f7fff7;
+  border: 1px solid rgba(0, 200, 117, 0.45);
+  border-radius: 14px;
+}
+.leaflet-popup-content { margin: 12px 14px; font-size: 13px; line-height: 1.5; }
+.leaflet-popup-content strong { color: var(--color-nusa-sun); }
+.leaflet-control-zoom a {
+  background: #061a14 !important;
+  color: #f7fff7 !important;
+  border-color: rgba(0, 200, 117, 0.35) !important;
+}
+.leaflet-control-attribution {
+  background: rgba(4, 24, 19, 0.7) !important;
+  color: #b8d8cd !important;
+}
+.leaflet-control-attribution a { color: var(--color-nusa-teal) !important; }
+
+/* Custom map pin (dark green + red highlight) */
+.nusa-pin {
+  width: 28px;
+  height: 28px;
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+.nusa-pin-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #0b3d2e;
+  border: 3px solid #fff;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+}
+.nusa-pin.highlight .nusa-pin-dot {
+  background: var(--color-nusa-coral);
+  width: 20px;
+  height: 20px;
+}
+.nusa-pin-ring {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 75, 47, 0.4);
+  animation: nusa-pulse 2s ease-out infinite;
+}
+@keyframes nusa-pulse {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* Hero image card */
+.nusa-hero {
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+.nusa-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.78));
+}
+
+/* Tile image (editorial) */
+.nusa-tile-img {
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+.nusa-tile-img::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.5));
+}
+
+/* Apply-to-itinerary selected ring */
+.nusa-selected-ring {
+  outline: 3px solid var(--color-nusa-sun);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px rgba(255, 212, 0, 0.18);
+}
+
+/* Subtle entrance */
+@keyframes nusa-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.nusa-rise { animation: nusa-rise 0.35s ease both; }
+
+/* ============ MapLibre GL — 3D map theming ============ */
+.maplibregl-map,
+.maplibregl-canvas {
+  background: #0a1d14 !important;
+  font-family: var(--font-manrope), sans-serif;
+}
+.maplibregl-ctrl-group {
+  background: rgba(6, 26, 20, 0.92) !important;
+  border: 1px solid rgba(0, 200, 117, 0.32) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+.maplibregl-ctrl-group button {
+  background: transparent !important;
+  color: #f7fff7 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+.maplibregl-ctrl-group button:hover {
+  background: rgba(0, 200, 117, 0.18) !important;
+}
+.maplibregl-ctrl-group button .maplibregl-ctrl-icon {
+  filter: invert(1) brightness(1.4);
+}
+.maplibregl-ctrl-scale {
+  background: rgba(4, 24, 19, 0.7) !important;
+  color: #f7fff7 !important;
+  border-color: rgba(255, 212, 0, 0.5) !important;
+  font-weight: 700;
+  border-radius: 6px;
+}
+.maplibregl-ctrl-attrib {
+  background: rgba(4, 24, 19, 0.75) !important;
+  color: #b8d8cd !important;
+  border-radius: 8px 0 0 0;
+}
+.maplibregl-ctrl-attrib a { color: var(--color-nusa-teal) !important; }
+.maplibregl-ctrl-attrib-button { background-color: rgba(0, 213, 255, 0.25) !important; }
+
+/* Popup (dark glass) */
+.nusa-maplibre-popup .maplibregl-popup-content {
+  background: #061a14;
+  color: #f7fff7;
+  border: 1px solid rgba(0, 200, 117, 0.45);
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+}
+.nusa-maplibre-popup .maplibregl-popup-content strong { color: var(--color-nusa-sun); }
+.nusa-maplibre-popup .maplibregl-popup-tip {
+  border-top-color: #061a14 !important;
+  border-bottom-color: #061a14 !important;
+}
+.nusa-maplibre-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+  border-bottom-color: rgba(0, 200, 117, 0.45) !important;
+}
+.nusa-maplibre-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+  border-top-color: rgba(0, 200, 117, 0.45) !important;
+}
+
+/* Marker pins on the 3D map — slightly larger + shadow for depth */
+.maplibregl-marker .nusa-pin { width: 32px; height: 32px; }
+.maplibregl-marker .nusa-pin-dot {
+  width: 18px;
+  height: 18px;
+  border: 3px solid #fff;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.55);
+}
+.maplibregl-marker .nusa-pin.highlight .nusa-pin-dot {
+  width: 22px;
+  height: 22px;
+}
+
+/* Compass on the navigation control */
+.maplibregl-ctrl-compass {
+  width: 30px !important;
+  height: 30px !important;
+}
+
+/* Print */
+@media print {
+  .nusa-no-print { display: none !important; }
+  body { background: #fff !important; color: #111 !important; }
+}

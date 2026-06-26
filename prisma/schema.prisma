@@ -1,0 +1,289 @@
+// Nusa Travel OS — Indonesia itinerary planner
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ── Core itinerary models (workspace) ──
+
+model Trip {
+  id           String       @id @default(cuid())
+  title        String
+  destination  String
+  dates        String
+  travellers   String
+  budget       String
+  pace         String
+  musts        String
+  restrictions String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  days         Day[]
+  suggestions  Suggestion[]
+}
+
+model Day {
+  id             String   @id @default(cuid())
+  tripId         String
+  trip           Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  order          Int
+  day            String
+  zone           String
+  title          String
+  image          String
+  morning        String
+  lunch          String
+  afternoon      String
+  night          String
+  transport      String
+  cost           String
+  time           String
+  mapQuery       String
+  wazeQuery      String
+  advice         String
+  hotelName      String?
+  hotelPrice     String?
+  hotelLink      String?
+  mealLunchName  String?
+  mealLunchPrice String?
+  mealLunchLink  String?
+  mealDinnerName String?
+  mealDinnerPrice String?
+  mealDinnerLink String?
+  coordsLat      Float?
+  coordsLng      Float?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([tripId])
+}
+
+model Suggestion {
+  id          String   @id @default(cuid())
+  tripId      String
+  trip        Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  type        String
+  title       String
+  note        String?
+  url         String?
+  author      String
+  imageUrl    String?
+  filePath    String?
+  sourceKind  String?
+  status      String   @default("pending")
+  appliedToDay Int?
+  coordsLat   Float?
+  coordsLng   Float?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tripId])
+  @@index([status])
+}
+
+model GuideEntry {
+  id        String   @id @default(cuid())
+  category  String
+  zone      String
+  title     String
+  text      String
+  price     String?
+  time      String?
+  link      String?
+  wazeQuery String?
+  image     String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+}
+
+// ── New section models ──
+
+model GastronomyRestaurant {
+  id             String   @id @default(cuid())
+  order          Int      @default(0)
+  name           String
+  zone           String
+  subzone        String   @default("")
+  region         String
+  description    String
+  signatureDish  String   @default("")
+  tip            String   @default("")
+  priceLevel     Int      @default(2)
+  type           String   @default("Restaurante")
+  cuisine        String   @default("")
+  address        String   @default("")
+  lat            Float?
+  lng            Float?
+  wazeUrl        String   @default("")
+  webUrl         String   @default("")
+  imageUrl       String   @default("")
+  rating         Float    @default(4.5)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Activity {
+  id               String   @id @default(cuid())
+  order            Int      @default(0)
+  name             String
+  slug             String   @default("")
+  zone             String
+  subzone          String   @default("")
+  region           String
+  lugarBase        String   @default("")
+  description      String
+  duration         String   @default("")
+  difficulty       String   @default("Fácil")
+  priceRange       String   @default("€€")
+  precioTipo       String   @default("")
+  category         String   @default("Naturaleza")
+  mejorEpoca       String   @default("")
+  mejorHora        String   @default("")
+  logistica        String   @default("")
+  consejos         String   @default("")
+  seguridad        String   @default("")
+  aptoNinos        String   @default("")
+  prioridad        String   @default("")
+  estadoVerificacion String  @default("")
+  sourceKey        String   @default("")
+  sourceUrl        String   @default("")
+  address          String   @default("")
+  lat              Float?
+  lng              Float?
+  wazeUrl          String   @default("")
+  webUrl           String   @default("")
+  imageUrl1        String   @default("")
+  imageUrl2        String   @default("")
+  imageUrl3        String   @default("")
+  imageUrl4        String   @default("")
+  rating           Float    @default(4.5)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Playa {
+  id             String   @id @default(cuid())
+  order          Int      @default(0)
+  name           String
+  zone           String
+  subzone        String   @default("")
+  region         String
+  ubicacion      String   @default("")
+  descripcion    String   @default("")
+  mejorHora      String   @default("")
+  banio          String   @default("")
+  acceso         String   @default("")
+  seguridad      String   @default("")
+  caracteristicas String  @default("")
+  area           String   @default("")
+  consejos       String   @default("")
+  prioridad      String   @default("media")
+  perfilPlaya    String   @default("")
+  address        String   @default("")
+  lat            Float?
+  lng            Float?
+  wazeUrl        String   @default("")
+  googleMapsUrl  String   @default("")
+  foto1          String   @default("")
+  foto2          String   @default("")
+  foto3          String   @default("")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model FaunaActivity {
+  id             String   @id @default(cuid())
+  order          Int      @default(0)
+  name           String
+  zone           String
+  subzone        String   @default("")
+  region         String
+  description    String
+  tipoActividad  String   @default("")
+  dificultad     String   @default("Fácil")
+  duracion       String   @default("")
+  mejorEpoca     String   @default("")
+  queVer         String   @default("")
+  peligro        String   @default("")
+  especie        String   @default("")
+  familia        String   @default("")
+  address        String   @default("")
+  lat            Float?
+  lng            Float?
+  wazeUrl        String   @default("")
+  webUrl         String   @default("")
+  foto1          String   @default("")
+  foto2          String   @default("")
+  foto3          String   @default("")
+  rating         Float    @default(4.5)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model SavedItinerary {
+  id          String   @id @default(cuid())
+  title       String
+  destination String
+  dates       String
+  travellers  String
+  budget      String
+  budgetTag   String   @default("medio") // barato | medio | premium
+  pace        String
+  musts       String
+  restrictions String?
+  daysCount   Int      @default(0)
+ dayData     String   @default("[]") // JSON array of day summaries
+  createdAt   DateTime @default(now())
+}
+
+model ElephantActivity {
+  id               String   @id @default(cuid())
+  order            Int      @default(0)
+  name             String
+  slug             String   @default("")
+  zone             String
+  subzone          String   @default("")
+  region           String
+  lugarBase        String   @default("")
+  description      String
+  tipoActividad    String   @default("")
+  dificultad       String   @default("Fácil")
+  duracion         String   @default("")
+  mejorEpoca       String   @default("")
+  mejorHora        String   @default("")
+  queVer           String   @default("")
+  peligro          String   @default("")
+  precio1Dia       String   @default("")
+  precio2Dias      String   @default("")
+  precio3Dias      String   @default("")
+  precioFecha      String   @default("")
+  logistica        String   @default("")
+  nivelTurismo     String   @default("")
+  nivelRespeto     String   @default("")
+  nivelContacto    String   @default("")
+  filtroResumen    String   @default("")
+  opinionPositiva  String   @default("")
+  opinionNegativa  String   @default("")
+  consejos         String   @default("")
+  recomendacion    String   @default("")
+  sourceUrl        String   @default("")
+  estadoVerificacion String  @default("")
+  address          String   @default("")
+  lat              Float?
+  lng              Float?
+  wazeUrl          String   @default("")
+  webUrl           String   @default("")
+  foto1            String   @default("")
+  foto2            String   @default("")
+  foto3            String   @default("")
+  rating           Float    @default(4.5)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}

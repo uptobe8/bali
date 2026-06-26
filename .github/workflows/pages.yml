@@ -24,22 +24,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Detect static output
+      - name: Validate gh-pages folder
         shell: bash
         run: |
           set -e
-          if [ -f "index.html" ]; then
-            echo "PUBLISH_DIR=." >> "$GITHUB_ENV"
-          elif [ -d "out" ] && [ -f "out/index.html" ]; then
-            echo "PUBLISH_DIR=out" >> "$GITHUB_ENV"
-          elif [ -d "dist" ] && [ -f "dist/index.html" ]; then
-            echo "PUBLISH_DIR=dist" >> "$GITHUB_ENV"
-          elif [ -d "build" ] && [ -f "build/index.html" ]; then
-            echo "PUBLISH_DIR=build" >> "$GITHUB_ENV"
-          else
-            echo "No static index.html found in ., out, dist or build" >&2
-            exit 1
-          fi
+          test -f gh-pages/index.html
+          echo "Publishing gh-pages/"
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -47,7 +37,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ env.PUBLISH_DIR }}
+          path: gh-pages
 
       - name: Deploy to GitHub Pages
         id: deployment

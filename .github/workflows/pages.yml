@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -24,28 +24,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          bun-version: latest
+          node-version: 22
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: npm install --legacy-peer-deps
 
       - name: Prepare static data
         run: |
           mkdir -p public
-          if [ -f db-export.json ]; then cp db-export.json public/db-export.json; fi
-          if [ -f gh-pages/_data.json ] && [ ! -f public/db-export.json ]; then cp gh-pages/_data.json public/db-export.json; fi
+          cp db-export.json public/db-export.json
+          if [ -d src/app/api ]; then mv src/app/api /tmp/nusa-api-disabled; fi
 
-      - name: Build static app
+      - name: Build static Next app
         env:
           NEXT_PUBLIC_STATIC_EXPORT: "true"
           NEXT_PUBLIC_BASE_PATH: "/bali"
-        run: bun run build
+        run: npx next build
 
-      - name: Validate static output
-        run: test -f out/index.html
+      - name: Add nojekyll
+        run: touch out/.nojekyll
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

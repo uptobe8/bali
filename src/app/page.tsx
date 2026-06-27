@@ -72,9 +72,9 @@ function Shell() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#03100b] text-nusa-mist">
-      <header className="sticky top-0 z-50 bg-[#041813]/85 backdrop-blur-md border-b border-white/10 nusa-no-print">
-        <div className="mx-auto max-w-7xl px-3 sm:px-6 py-3 flex items-center gap-3">
-          <button onClick={() => navigate('inicio')} className="flex items-center gap-2 shrink-0 group" aria-label="Nusa Travel OS — inicio">
+      <header className="sticky top-0 z-50 bg-[#041813]/90 backdrop-blur-md border-b border-white/10 nusa-no-print">
+        <div className="mx-auto max-w-7xl px-3 sm:px-6 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
+          <button onClick={() => navigate('inicio')} className="flex items-center gap-2 shrink-0 group self-start" aria-label="Nusa Travel OS — inicio">
             <span className="grid place-items-center w-9 h-9 rounded-xl bg-gradient-to-br from-nusa-jungle to-nusa-teal text-nusa-ink shadow-lg group-hover:scale-105 transition">
               <Leaf className="w-5 h-5" />
             </span>
@@ -83,7 +83,7 @@ function Shell() {
               <span className="block kicker kicker-sun">Indonesia · Bali</span>
             </span>
           </button>
-          <nav className="ml-auto flex items-center gap-1.5 overflow-x-auto nusa-scroll py-1" aria-label="Navegación principal">
+          <nav className="nusa-mobile-nav w-full sm:w-auto sm:ml-auto flex items-center gap-1.5 overflow-x-auto nusa-scroll py-1" aria-label="Navegación principal">
             {PAGES.map((p) => (
               <button key={p.id} onClick={() => navigate(p.id)} className={`nusa-nav-pill ${p.id === page ? 'active' : ''}`} aria-current={p.id === page ? 'page' : undefined}>
                 {p.label}
@@ -93,7 +93,7 @@ function Shell() {
         </div>
       </header>
 
-      <main className="flex-1">
+      <main className="flex-1 min-w-0">
         <AnimatePresence mode="wait">
           <motion.div key={page} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28, ease: 'easeOut' }}>
             {page === 'inicio' && <InicioPage navigate={navigate} />}
@@ -116,9 +116,9 @@ function Shell() {
           <button onClick={() => go(-1)} className="nusa-btn-secondary inline-flex items-center gap-1.5 text-sm !py-2.5 !px-3 sm:!px-4" aria-label="Página anterior">
             <ChevronLeft className="w-4 h-4" /><span className="hidden sm:inline">Anterior</span>
           </button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0 overflow-x-auto">
             {PAGES.map((p) => (
-              <button key={p.id} onClick={() => navigate(p.id)} className={`nusa-dot ${p.id === page ? 'active' : ''}`} aria-label={`Ir a ${p.label}`} aria-current={p.id === page ? 'page' : undefined} />
+              <button key={p.id} onClick={() => navigate(p.id)} className={`nusa-dot shrink-0 ${p.id === page ? 'active' : ''}`} aria-label={`Ir a ${p.label}`} aria-current={p.id === page ? 'page' : undefined} />
             ))}
             <span className="ml-3 text-[11px] text-white/55 font-bold hidden sm:block">{PAGES[idx].label} · {idx + 1}/{PAGES.length}</span>
           </div>

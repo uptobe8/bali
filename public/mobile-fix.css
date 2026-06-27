@@ -3,26 +3,23 @@
   body {
     width: 100%;
     max-width: 100%;
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
+    overflow-y: auto !important;
     overscroll-behavior-x: none;
+    -webkit-overflow-scrolling: touch;
   }
 
   body {
-    position: relative;
+    min-height: 100%;
+    touch-action: pan-y;
   }
 
-  main,
-  header,
-  footer,
-  .nusa-paper,
-  .nusa-paper-2,
-  .nusa-card-paper,
-  .nusa-panel,
-  article,
-  section,
-  aside {
-    max-width: 100vw !important;
-    overflow-x: hidden;
+  main {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: clip;
+    overflow-y: visible;
   }
 
   main > div,
@@ -52,23 +49,55 @@
   span,
   a,
   button {
-    overflow-wrap: anywhere;
-    word-break: normal;
+    overflow-wrap: break-word;
   }
 
-  .nusa-nav-pill,
-  header nav,
-  .nusa-scroll,
+  header.nusa-no-print {
+    width: 100%;
+    max-width: 100%;
+    overflow: visible;
+  }
+
+  header.nusa-no-print nav,
+  .nusa-mobile-nav {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+
+  header.nusa-no-print nav::-webkit-scrollbar,
+  .nusa-mobile-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nusa-nav-pill {
+    flex: 0 0 auto;
+    white-space: nowrap !important;
+    font-size: 13px;
+    padding: 8px 13px;
+  }
+
   .nusa-scroll-paper {
     overflow-x: auto !important;
-    overflow-y: hidden;
-    max-width: 100vw !important;
+    overflow-y: visible !important;
+    max-width: 100% !important;
     -webkit-overflow-scrolling: touch;
   }
 
-  .nusa-scroll-paper > button,
-  .nusa-scroll > button {
-    max-width: calc(100vw - 2rem) !important;
+  .nusa-card-paper,
+  .nusa-panel,
+  article,
+  section,
+  aside {
+    max-width: 100%;
+    min-width: 0;
   }
 
   .nusa-btn-primary,
@@ -78,7 +107,6 @@
   a[class*='rounded-full'],
   button[class*='rounded-full'] {
     max-width: 100%;
-    white-space: normal !important;
   }
 
   img,
@@ -86,10 +114,5 @@
   canvas,
   svg {
     max-width: 100%;
-  }
-
-  .nusa-hero,
-  [style*='background-image'] {
-    max-width: 100% !important;
   }
 }

@@ -23,7 +23,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         {isStatic ? <script src={`${basePath}/image-fallbacks.js`} /> : null}
         {isStatic ? <script src={`${basePath}/final-mobile-gallery-fix.js`} /> : null}
         {isStatic ? <script src={`${basePath}/home-cleanup.js`} /> : null}
-        {isStatic ? <script src={`${basePath}/hero-video-sound-fix.js`} /> : null}
       </head>
       <body className={`${manrope.variable} ${playfair.variable} font-sans antialiased bg-nusa-ink text-nusa-mist`}>
         {children}

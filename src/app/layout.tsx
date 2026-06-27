@@ -19,15 +19,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <meta name="nusa-base-path" content={basePath} />
         {isStatic ? <link rel="stylesheet" href={`${basePath}/mobile-fix.css`} /> : null}
         {isStatic ? <script src={`${basePath}/static-api.js`} /> : null}
-        {isStatic ? <script src={`${basePath}/real-guide.js`} /> : null}
-        {isStatic ? <script src={`${basePath}/guide-real-min.js`} /> : null}
         {isStatic ? <script src={`${basePath}/budget-variants.js`} /> : null}
         {isStatic ? <script src={`${basePath}/image-fallbacks.js`} /> : null}
         {isStatic ? <script src={`${basePath}/final-mobile-gallery-fix.js`} /> : null}
         {isStatic ? <script src={`${basePath}/home-cleanup.js`} /> : null}
         {isStatic ? <script src={`${basePath}/hero-video-sound-fix.js`} /> : null}
-        {isStatic ? <script src={`${basePath}/sound-kill-switch.js`} /> : null}
-        {isStatic ? <script src={`${basePath}/audio-hard-off.js`} /> : null}
       </head>
       <body className={`${manrope.variable} ${playfair.variable} font-sans antialiased bg-nusa-ink text-nusa-mist`}>
         {children}

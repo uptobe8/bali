@@ -36,17 +36,17 @@
     return fixedAsset(value);
   }
 
-  function elephantImage(item, index, offset) {
-    const order = Number(item && item.order ? item.order : index + 1);
-    return fixedAsset(elephantPhotos[(Math.max(order, 1) - 1 + offset) % elephantPhotos.length]);
+  function elephantImage(index, offset) {
+    const n = (index * 3 + offset) % elephantPhotos.length;
+    return fixedAsset(elephantPhotos[n]);
   }
 
   function patchElephants(list) {
     return (Array.isArray(list) ? list : []).map((item, index) => ({
       ...item,
-      foto1: fixedAsset(item.foto1 || item.imageUrl1 || item.imageUrl || item.image || elephantImage(item, index, 0)),
-      foto2: fixedAsset(item.foto2 || item.imageUrl2 || elephantImage(item, index, 1)),
-      foto3: fixedAsset(item.foto3 || item.imageUrl3 || elephantImage(item, index, 2)),
+      foto1: elephantImage(index, 0),
+      foto2: elephantImage(index, 1),
+      foto3: elephantImage(index, 2),
     }));
   }
 
@@ -97,15 +97,7 @@
 
   function buildItinerary(preferences = {}) {
     const trip = {
-      id: uid('trip'),
-      title: preferences.destination || 'Indonesia · Bali',
-      destination: preferences.destination || 'Indonesia · Bali',
-      dates: preferences.dates || '14-16 días',
-      travellers: preferences.travellers || 'Pareja / familia',
-      budget: preferences.budget || 'Medio',
-      pace: preferences.pace || 'Equilibrado',
-      musts: preferences.musts || 'Bali, Ubud, Uluwatu, Gili Meno, Padang Padang',
-      restrictions: preferences.restrictions || null,
+      id: uid('trip'), title: preferences.destination || 'Indonesia · Bali', destination: preferences.destination || 'Indonesia · Bali', dates: preferences.dates || '14-16 días', travellers: preferences.travellers || 'Pareja / familia', budget: preferences.budget || 'Medio', pace: preferences.pace || 'Equilibrado', musts: preferences.musts || 'Bali, Ubud, Uluwatu, Gili Meno, Padang Padang', restrictions: preferences.restrictions || null,
     };
     const zones = ['Ubud', 'Sidemen', 'Uluwatu', 'Padang Padang', 'Sanur', 'Gili Meno', 'Nusa Penida', 'Seminyak'];
     const images = ['/hero-bali.jpg','/hero-bali.jpg','/playas/bali/padang-padang-beach-labuan-sait/foto-1.jpg','/playas/bali/bingin-beach/foto-1.jpg'].map(fixedAsset);

@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getPlayas } from '@/lib/client/api'
 import { Input } from '@/components/ui/input'
@@ -14,6 +14,26 @@ import { PLAYA_REGIONS, PLAYA_PERFILES } from '@/lib/types'
 
 const PRIORIDAD_STYLE: Record<string, string> = { alta: 'bg-nusa-jungle text-white', media: 'bg-nusa-sun text-ink', baja: 'bg-ink/20 text-ink/60' }
 
+function PhotoGallery({ fotos, name }: { fotos: string[]; name: string }) {
+  const [active, setActive] = useState(fotos[0] || '')
+  useEffect(() => { setActive(fotos[0] || '') }, [fotos.join('|')])
+  if (!active) return null
+  return (
+    <div className="mt-4">
+      <img src={active} alt={name} className="w-full h-56 object-cover rounded-lg bg-paper-2" />
+      {fotos.length > 1 && (
+        <div className="flex gap-2 mt-2 overflow-x-auto pb-1 nusa-scroll-paper">
+          {fotos.map((f, i) => (
+            <button key={`${f}-${i}`} type="button" onClick={() => setActive(f)} className={`shrink-0 rounded-lg overflow-hidden border-2 ${active === f ? 'border-nusa-teal' : 'border-transparent'}`} aria-label={`Ver foto ${i + 1} de ${name}`}>
+              <img src={f} alt={`${name} ${i + 1}`} className="w-20 h-20 object-cover bg-paper-2" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function DetailSheet({ item, open, onOpenChange }: { item: Playa | null; open: boolean; onOpenChange: (v: boolean) => void }) {
   if (!item) return null
   const fotos = [item.foto1, item.foto2, item.foto3].filter(Boolean)
@@ -23,8 +43,7 @@ function DetailSheet({ item, open, onOpenChange }: { item: Playa | null; open: b
         <SheetHeader>
           <SheetTitle className="font-display text-2xl text-ink">{item.name}</SheetTitle>
         </SheetHeader>
-        {fotos[0] && <img src={fotos[0]} alt={item.name} className="w-full h-48 object-cover rounded-lg mt-4" />}
-        {fotos.length > 1 && <div className="flex gap-2 mt-2">{fotos.slice(1).map((f, i) => <img key={i} src={f} alt="" className="w-20 h-20 object-cover rounded-lg cursor-pointer hover:ring-2 ring-nusa-teal transition" />)}</div>}
+        <PhotoGallery fotos={fotos} name={item.name} />
         <div className="mt-4 space-y-3">
           <div className="flex gap-2 flex-wrap">
             <Badge variant="secondary" className="bg-nusa-teal/10 text-nusa-teal">{item.zone}</Badge>
@@ -48,7 +67,7 @@ function DetailSheet({ item, open, onOpenChange }: { item: Playa | null; open: b
               <p className="mt-1 text-ink/80">{item.consejos}</p>
             </div>
           )}
-          <div className="flex gap-2 pt-2">
+          <div className="flex gap-2 pt-2 flex-wrap">
             {item.wazeUrl && <Button size="sm" className="nusa-btn-primary" asChild><a href={item.wazeUrl} target="_blank" rel="noopener"><MapPin className="w-4 h-4 mr-1" />Waze</a></Button>}
             {item.googleMapsUrl && <Button size="sm" variant="outline" className="border-leaf text-leaf hover:bg-leaf/10" asChild><a href={item.googleMapsUrl} target="_blank" rel="noopener"><ExternalLink className="w-4 h-4 mr-1" />Google Maps</a></Button>}
           </div>

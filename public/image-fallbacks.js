@@ -30,6 +30,28 @@
     return src;
   }
 
+  function bindGalleryClicks() {
+    document.querySelectorAll('[role="dialog"], [data-radix-dialog-content], .nusa-scroll').forEach((dialog) => {
+      const imgs = Array.from(dialog.querySelectorAll('img'));
+      if (imgs.length < 2) return;
+      const main = imgs.find((img) => img.clientWidth > 180 || img.className.includes('h-48')) || imgs[0];
+      imgs.forEach((img) => {
+        if (img === main || img.dataset.nusaGalleryBound) return;
+        img.dataset.nusaGalleryBound = '1';
+        img.style.cursor = 'pointer';
+        img.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          const src = full(img.getAttribute('src') || '');
+          if (src) main.setAttribute('src', src);
+          imgs.forEach((x) => x.style.outline = '');
+          img.style.outline = '2px solid #00d5ff';
+          img.style.outlineOffset = '2px';
+        });
+      });
+    });
+  }
+
   function repair() {
     document.querySelectorAll('img').forEach((img, index) => {
       const current = img.getAttribute('src') || '';
@@ -45,8 +67,8 @@
           if (next && next !== now && !img.dataset.nusaFallbackUsed) {
             img.dataset.nusaFallbackUsed = '1';
             img.setAttribute('src', full(next));
-          } else {
-            img.style.display = 'none';
+          } else if (img.naturalWidth === 0) {
+            img.style.visibility = 'hidden';
           }
         });
       }
@@ -59,9 +81,11 @@
       });
       if (next !== style) el.setAttribute('style', next);
     });
+
+    bindGalleryClicks();
   }
 
   document.addEventListener('DOMContentLoaded', repair);
-  new MutationObserver(repair).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['src', 'style'] });
+  new MutationObserver(repair).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['src', 'style', 'class'] });
   setInterval(repair, 1200);
 })();

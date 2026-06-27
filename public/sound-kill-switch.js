@@ -3,8 +3,8 @@
   window.__NUSA_SOUND_KILL_SWITCH__ = true;
 
   const KEY = 'nusa-sound-enabled';
-  const wantsSound = () => localStorage.getItem(KEY) === '1';
-  const setWanted = (value) => localStorage.setItem(KEY, value ? '1' : '0');
+  const wantsSound = () => ['1', 'true', 'on'].includes(String(localStorage.getItem(KEY)).toLowerCase());
+  const setWanted = (value) => localStorage.setItem(KEY, value ? 'true' : 'false');
 
   function allMedia() {
     return Array.from(document.querySelectorAll('audio, video'));
@@ -21,7 +21,10 @@
         } else {
           media.muted = true;
           media.volume = 0;
-          if (media.tagName === 'AUDIO') media.pause();
+          if (media.tagName === 'AUDIO') {
+            media.pause();
+            media.currentTime = 0;
+          }
         }
       } catch {}
     });
@@ -55,5 +58,5 @@
   setInterval(() => {
     if (!wantsSound()) applySound(false);
     bindButtons();
-  }, 900);
+  }, 700);
 })();

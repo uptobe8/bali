@@ -3,22 +3,16 @@
   body {
     width: 100%;
     max-width: 100%;
-    overflow-x: clip !important;
+    overflow-x: hidden !important;
     overflow-y: auto !important;
-    overscroll-behavior-x: none;
     -webkit-overflow-scrolling: touch;
-  }
-
-  body {
-    min-height: 100%;
-    touch-action: pan-y;
   }
 
   main {
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    overflow-x: clip;
+    overflow-x: hidden;
     overflow-y: visible;
   }
 
@@ -52,13 +46,17 @@
     overflow-wrap: break-word;
   }
 
-  header.nusa-no-print {
-    width: 100%;
-    max-width: 100%;
-    overflow: visible;
+  .nusa-mobile-header {
+    display: grid !important;
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 8px;
+    align-items: center;
   }
 
-  header.nusa-no-print nav,
+  .nusa-mobile-logo {
+    width: 40px;
+  }
+
   .nusa-mobile-nav {
     width: 100%;
     max-width: 100%;
@@ -69,10 +67,9 @@
     overflow-y: hidden !important;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    padding-bottom: 4px;
+    padding: 2px 0 6px;
   }
 
-  header.nusa-no-print nav::-webkit-scrollbar,
   .nusa-mobile-nav::-webkit-scrollbar {
     display: none;
   }
@@ -98,15 +95,6 @@
   aside {
     max-width: 100%;
     min-width: 0;
-  }
-
-  .nusa-btn-primary,
-  .nusa-btn-secondary,
-  .nusa-btn-ghost,
-  .nusa-btn-ember,
-  a[class*='rounded-full'],
-  button[class*='rounded-full'] {
-    max-width: 100%;
   }
 
   img,

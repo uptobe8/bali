@@ -6,7 +6,18 @@ import { getItinerary } from '@/lib/client/api'
 import { DayDetail } from './DayDetail'
 import { EmptyTripState } from './EmptyTripState'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Plane, Compass } from 'lucide-react'
+import { Plane, Compass, WalletCards } from 'lucide-react'
+import type { Day, Trip } from '@/lib/types'
+
+type ItineraryVariant = {
+  id: 'economica' | 'media' | 'premium' | string
+  label: string
+  tag: string
+  description: string
+  totalEstimate: string
+  trip: Trip
+  days: Day[]
+}
 
 export function ItinerarioPage({
   navigate,
@@ -18,11 +29,21 @@ export function ItinerarioPage({
     queryFn: getItinerary,
   })
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [selectedVariantId, setSelectedVariantId] = useState<string>('media')
 
-  const days = data?.days ?? []
-  const trip = data?.trip ?? null
-  const selected =
-    days.find((d) => d.id === selectedId) ?? days[0] ?? null
+  const variants = (((data as unknown as { variants?: ItineraryVariant[] })?.variants) ?? [])
+    .filter((v) => v?.trip && Array.isArray(v.days) && v.days.length > 0)
+  const activeVariant =
+    variants.find((v) => v.id === selectedVariantId) ??
+    variants.find((v) => v.id === 'media') ??
+    variants[0] ??
+    null
+
+  const baseDays = data?.days ?? []
+  const baseTrip = data?.trip ?? null
+  const days = activeVariant?.days ?? baseDays
+  const trip = activeVariant?.trip ?? baseTrip
+  const selected = days.find((d) => d.id === selectedId) ?? days[0] ?? null
 
   // Empty state: no trip generated yet
   if (!isLoading && !isError && !trip) {
@@ -72,6 +93,53 @@ export function ItinerarioPage({
           <div className="nusa-card-paper p-6 text-ink-soft">
             No pudimos cargar el itinerario. Reintenta en unos segundos.
           </div>
+        )}
+
+        {variants.length >= 3 && (
+          <section className="mb-8">
+            <div className="flex items-center gap-2 mb-3">
+              <WalletCards className="w-5 h-5 text-ember" />
+              <div>
+                <div className="kicker kicker-ember">Elige versión de presupuesto</div>
+                <p className="text-sm text-ink-soft mt-1">
+                  Las 3 opciones respetan destino, duración, viajeros, ritmo, intereses y restricciones seleccionadas. Solo cambia el nivel de coste.
+                </p>
+              </div>
+            </div>
+            <div className="grid md:grid-cols-3 gap-3">
+              {variants.map((v) => {
+                const active = activeVariant?.id === v.id
+                return (
+                  <button
+                    key={v.id}
+                    onClick={() => {
+                      setSelectedVariantId(v.id)
+                      setSelectedId(null)
+                    }}
+                    className={`text-left rounded-2xl border p-4 transition ${
+                      active
+                        ? 'bg-white border-ember shadow-[0_12px_34px_rgba(232,119,34,0.18)]'
+                        : 'bg-white/65 border-leaf/12 hover:bg-white'
+                    }`}
+                    aria-pressed={active}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="font-display text-2xl text-ink">{v.label}</div>
+                      <span className={`rounded-full px-2.5 py-1 text-[11px] font-black uppercase tracking-wider ${active ? 'bg-ember text-white' : 'bg-leaf/10 text-leaf'}`}>
+                        {v.tag}
+                      </span>
+                    </div>
+                    <div className="mt-2 text-sm font-black text-ember">
+                      {v.totalEstimate}
+                    </div>
+                    <p className="mt-2 text-sm text-ink-soft leading-relaxed">
+                      {v.description}
+                    </p>
+                  </button>
+                )
+              })}
+            </div>
+          </section>
         )}
 
         {days.length > 0 && (
